@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz Night - The Weekly Fifty</title>
+<style>
+  :root{
+    --bg:#677c73;
+    --surface:#000716;
+    --text:#fbe2df;
+    --muted:rgba(251,226,223,0.72);
+    --line:rgba(251,226,223,0.4);
+    --good:#4cfbab;
+    --bad:#f78da7;
+    --font-main:Helvetica,Verdana,Arial,sans-serif;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0;
+    height:100%;
+    background:var(--bg);
+    color:var(--text);
+    font-family:var(--font-main);
+  }
+  body{overflow:hidden;}
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.001ms !important; transition-duration:0.001ms !important;}
+  }
+
+  button{
+    font-family:var(--font-main);
+    cursor:pointer;
+    touch-action:manipulation;
+  }
+
+  button:focus-visible,
+  a:focus-visible,
+  textarea:focus-visible,
+  input:focus-visible{
+    outline:3px solid var(--text);
+    outline-offset:2px;
+  }
+
+  #app{
+    position:relative;
+    width:100%;
+    height:100%;
+    display:flex;
+    flex-direction:column;
+  }
+
+  #progressTrack{
+    height:6px;
+    background:rgba(0,7,22,0.26);
+    flex-shrink:0;
+  }
+
+  #progressFill{
+    height:100%;
+    background:var(--text);
+    width:0%;
+    transition:width 0.35s ease;
+  }
+
+  #stage{
+    flex:1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px 6vw 9vh;
+    overflow-y:auto;
+  }
+
+  .slideInner{
+    max-width:960px;
+    width:100%;
+    text-align:center;
+    margin:auto;
+  }
+
+  .wordmark{
+    margin:0 0 8px;
+    font-size:clamp(34px,6vw,64px);
+    line-height:1;
+    font-weight:700;
+    text-transform:uppercase;
+  }
+
+  .subtitle{
+    margin:0 0 24px;
+    font-size:clamp(18px,2vw,22px);
+    color:var(--text);
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+  }
+
+  .statusLine{
+    margin-bottom:30px;
+    font-size:12px;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:var(--muted);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+  }
+
+  .dot{
+    width:7px;
+    height:7px;
+    border-radius:50%;
+    background:currentColor;
+    flex-shrink:0;
+  }
+
+  .bigBtn,
+  .ghostBtn,
+  .revealBtn,
+  .smallBtn,
+  .markBtn{
+    border-radius:50px;
+    border:1px solid var(--text);
+    background:transparent;
+    color:var(--text);
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+  }
+
+  .bigBtn{
+    font-size:clamp(18px,2vw,22px);
+    font-weight:700;
+    min-height:64px;
+    padding:16px 44px;
+  }
+
+  .ghostBtn{
+    min-height:54px;
+    padding:12px 24px;
+    font-size:13px;
+    color:var(--muted);
+    border-color:var(--line);
+  }
+
+  .bigBtn:hover,
+  .ghostBtn:hover,
+  .revealBtn:hover,
+  .smallBtn:hover{
+    background:var(--text);
+    color:var(--bg);
+    border-color:var(--text);
+  }
+
+  .titleControls{
+    margin-top:14px;
+    display:flex;
+    justify-content:center;
+    gap:12px;
+    flex-wrap:wrap;
+  }
+
+  .qNumber{
+    font-size:16px;
+    text-transform:uppercase;
+    letter-spacing:0.12em;
+    color:var(--muted);
+    margin-bottom:18px;
+  }
+
+  .qText{
+    margin:0 0 34px;
+    font-size:clamp(22px,3.4vw,38px);
+    line-height:1.32;
+    font-weight:700;
+  }
+
+  .qText em{
+    font-style:normal;
+    font-weight:700;
+  }
+
+  .miniBtn{
+    min-height:40px;
+    padding:8px 10px;
+    border:none;
+    border-radius:0;
+    background:transparent;
+    color:var(--muted);
+    font-size:12px;
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+  }
+
+  .miniBtn:hover{
+    color:var(--text);
+  }
+
+  .navCorner{
+    position:fixed;
+    left:16px;
+    bottom:16px;
+    z-index:20;
+    display:flex;
+    gap:8px;
+  }
+  .scoreCorner{
+    position:fixed;
+    right:16px;
+    bottom:16px;
+    z-index:20;
+  }
+
+  .revealBtn{
+    min-height:58px;
+    padding:14px 34px;
+    font-size:16px;
+    font-weight:700;
+  }
+
+  .answerWrap{margin-top:8px; perspective:1200px;}
+
+  .flipCard{
+    transform:rotateX(-90deg);
+    transform-origin:top center;
+    opacity:0;
+    transition:transform .5s cubic-bezier(.2,.8,.2,1.1), opacity .35s ease;
+  }
+
+  .flipCard.shown{
+    transform:rotateX(0deg);
+    opacity:1;
+  }
+
+  .answerBox{
+    background:transparent;
+    border:none;
+    border-radius:0;
+    padding:26px 30px;
+    text-align:center;
+    box-shadow:none;
+  }
+
+  .answerLabel{
+    margin-bottom:18px;
+    font-size:16px;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:var(--muted);
+  }
+
+  .answerText{
+    font-size:clamp(18px,2.4vw,26px);
+    line-height:1.4;
+    font-weight:600;
+    text-align:center;
+  }
+
+  .answerText *{
+    background:transparent !important;
+    color:inherit !important;
+    box-shadow:none !important;
+  }
+
+  .answerText a{
+    color:var(--text) !important;
+    text-decoration:underline;
+  }
+
+  .answerText ul{margin:6px 0 0; padding-left:0; list-style:none;}
+  .answerText li{margin-bottom:4px; text-align:center; list-style:none;}
+
+  .markRow{
+    margin-top:26px;
+    display:flex;
+    justify-content:center;
+    gap:14px;
+    flex-wrap:wrap;
+  }
+
+  .markBtn{
+    min-height:56px;
+    min-width:180px;
+    border-width:2px;
+    border-color:var(--line);
+    color:var(--muted);
+    padding:14px 28px;
+    font-size:15px;
+    font-weight:700;
+    transition:all .15s ease;
+  }
+
+  .markBtn.correct:hover,
+  .markBtn.correct.active{
+    border-color:var(--good);
+    color:var(--good);
+    background:rgba(76,251,171,0.12);
+  }
+
+  .markBtn.incorrect:hover,
+  .markBtn.incorrect.active{
+    border-color:var(--bad);
+    color:var(--bad);
+    background:rgba(247,141,167,0.14);
+  }
+
+  #scoreboard{
+    position:fixed;
+    top:14px;
+    right:16px;
+    background:var(--bg);
+    color:var(--muted);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:8px 16px;
+    font-size:13px;
+    display:none;
+    align-items:center;
+    gap:8px;
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+  }
+
+  #scoreboard b{
+    color:var(--text);
+    font-size:16px;
+    letter-spacing:normal;
+  }
+
+  .finalScore{
+    margin:10px 0 4px;
+    font-size:clamp(60px,12vw,140px);
+    line-height:1;
+    font-weight:700;
+  }
+
+  .finalVerdict{
+    margin:0 0 10px;
+    font-size:clamp(20px,3vw,30px);
+    text-transform:uppercase;
+  }
+
+  .finalNotes{
+    margin:30px auto 0;
+    max-width:560px;
+    font-size:14px;
+    line-height:1.6;
+    color:var(--muted);
+  }
+
+  .panel{
+    max-width:700px;
+    margin:0 auto;
+    text-align:left;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:30px 34px;
+  }
+
+  .panel h2{
+    margin:0 0 10px;
+    font-size:20px;
+    text-transform:uppercase;
+  }
+
+  .panel p,
+  .panel ol{
+    color:var(--muted);
+    font-size:14px;
+    line-height:1.6;
+  }
+
+  .panel ol{padding-left:20px; margin:0 0 18px;}
+
+  .panel code{
+    background:rgba(251,226,223,0.08);
+    padding:2px 6px;
+    border-radius:4px;
+    font-size:12.5px;
+    color:var(--text);
+    word-break:break-all;
+  }
+
+  textarea{
+    width:100%;
+    min-height:120px;
+    resize:vertical;
+    margin-bottom:12px;
+    background:var(--bg);
+    color:var(--text);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:12px;
+    font-size:12px;
+    font-family:var(--font-main);
+  }
+
+  .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center;}
+
+  .smallInput{
+    flex:1;
+    min-width:220px;
+    background:var(--bg);
+    color:var(--text);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:10px 12px;
+    font-size:12px;
+    font-family:var(--font-main);
+  }
+
+  .smallBtn{
+    min-height:48px;
+    padding:10px 18px;
+    border-color:var(--line);
+    color:var(--text);
+    font-size:12px;
+  }
+
+  .smallBtn.secondary{color:var(--muted);}
+
+  details{margin-top:16px;}
+  summary{
+    cursor:pointer;
+    font-size:12px;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    color:var(--muted);
+  }
+
+  .inlineErr{
+    display:none;
+    margin-top:8px;
+    font-size:12px;
+    color:var(--bad);
+  }
+
+  .spinner{
+    width:34px;
+    height:34px;
+    border-radius:50%;
+    border:3px solid var(--line);
+    border-top-color:var(--text);
+    animation:spin 0.9s linear infinite;
+    margin:0 auto 24px;
+  }
+
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  @media (max-width:1024px){
+    #stage{padding:10px 5vw 12vh;}
+    .markBtn{min-width:160px;}
+  }
+
+  @media (max-width:640px){
+    #scoreboard{top:10px; right:10px; font-size:12px;}
+    .markRow{flex-direction:column; align-items:center;}
+    .markBtn{width:100%; max-width:320px;}
+    .navCorner{left:10px; bottom:10px;}
+    .scoreCorner{right:10px; bottom:10px;}
+  }
+</style>
+</head>
+<body>
+
+<div id="app">
+  <div id="progressTrack"><div id="progressFill"></div></div>
+  <div id="stage"></div>
+</div>
+
+<div id="scoreboard">Score <b id="scoreVal">0</b> / <span id="scoreTotal">0</span></div>
+
+<script>
+(function(){
+  "use strict";
+
+  const QUIZ_PAGE_URL = "https://theweeklyfifty.com.au/this-weeks-quiz/";
+  const DIRECT_QUIZ_API_URL = "https://weeklyfifty-7617b.web.app/api/getLatestQuiz";
+  const SAME_ORIGIN_PROXY_API_URL = "/api/getLatestQuiz";
+
+  let slides = [];
+  let current = 0;
+  let sourceLabel = "";
+  let hideLiveScore = false;
+  let advanceTimer = null;
+  let maxVisitedQuestionIndex = 0;
+
+  const stage = document.getElementById("stage");
+  const progressFill = document.getElementById("progressFill");
+  const scoreboard = document.getElementById("scoreboard");
+  const scoreVal = document.getElementById("scoreVal");
+  const scoreTotal = document.getElementById("scoreTotal");
+
+  function sanitizeFragment(html){
+    const doc = new DOMParser().parseFromString("<div>" + html + "</div>", "text/html");
+    const root = doc.body.firstChild;
+    if (!root) return "";
+
+    root.querySelectorAll("script,style,iframe,object,embed").forEach(el => el.remove());
+    root.querySelectorAll("*").forEach(el => {
+      Array.from(el.attributes).forEach(attr => {
+        const name = attr.name.toLowerCase();
+        if (name.startsWith("on") || (name === "href" && /^\s*javascript:/i.test(attr.value))) {
+          el.removeAttribute(attr.name);
+        }
+      });
+    });
+    return root.innerHTML;
+  }
+
+  function parseQuizHTML(html){
+    const doc = new DOMParser().parseFromString(html, "text/html");
+    const titleEl = doc.querySelector(".quizTitle");
+    const title = titleEl ? titleEl.textContent.trim() : "This Week's Fifty";
+
+    const scope = doc.querySelector(".quiz.active") || doc.querySelector(".quizContainer") || doc;
+    const qEls = Array.from(scope.querySelectorAll(".question"));
+
+    const questions = qEls.map((q, i) => {
+      const qTextEl = q.querySelector(".questionText");
+      let number = String(i + 1);
+      let questionHTML = "";
+
+      if (qTextEl) {
+        const clone = qTextEl.cloneNode(true);
+        const bTag = clone.querySelector("b");
+        if (bTag) {
+          const m = bTag.textContent.match(/(\d+)/);
+          if (m) number = m[1];
+          bTag.remove();
+        }
+        questionHTML = sanitizeFragment(clone.innerHTML.trim());
+      }
+
+      const answerEl = q.querySelector(".answerText");
+      const answerHTML = answerEl
+        ? sanitizeFragment(answerEl.innerHTML.trim())
+        : "<em>No answer found in source.</em>";
+
+      return { number, questionHTML, answerHTML };
+    }).filter(q => q.questionHTML);
+
+    const notesEl = doc.querySelector(".quizNotes");
+    const notes = notesEl ? sanitizeFragment(notesEl.innerHTML.trim()) : "";
+
+    return { title, questions, notes };
+  }
+
+  function formatDeploymentDate(dateString){
+    if (!dateString) return "";
+    try {
+      return new Intl.DateTimeFormat("en-AU", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        timeZone: "Australia/Adelaide"
+      }).format(new Date(dateString));
+    } catch (_) {
+      return "";
+    }
+  }
+
+  function parseQuizAPIData(data){
+    const quizzes = Array.isArray(data) ? data : [data];
+    const quiz = quizzes[0];
+    if (!quiz || !Array.isArray(quiz.questions) || !quiz.questions.length) {
+      throw new Error("Quiz API response did not contain questions.");
+    }
+
+    const titleParts = [];
+    if (quiz.quiz_id !== undefined && quiz.quiz_id !== null) {
+      titleParts.push("Quiz " + String(quiz.quiz_id));
+    }
+    const deployed = formatDeploymentDate(quiz.deploymentDate);
+    if (deployed) titleParts.push(deployed);
+    const title = titleParts.length ? titleParts.join(" - ") : "This Week's Fifty";
+
+    const questions = quiz.questions.map((q, i) => {
+      const rawQ = q.qTitle || q.question || "";
+      const rawA = q.qAnswer || q.answer || "<em>No answer found in source.</em>";
+      return {
+        number: String((q.qNum !== undefined && q.qNum !== null) ? q.qNum : i + 1),
+        questionHTML: sanitizeFragment(String(rawQ)),
+        answerHTML: sanitizeFragment(String(rawA))
+      };
+    }).filter(q => q.questionHTML);
+
+    if (!questions.length) {
+      throw new Error("Quiz API response had no usable question text.");
+    }
+
+    const notes = [quiz.notesAbove, quiz.notesBelow]
+      .filter(Boolean)
+      .map(val => sanitizeFragment(String(val)))
+      .join("<br><br>");
+
+    return { title, questions, notes };
+  }
+
+  async function fetchText(url){
+    const res = await fetch(url, { cache: "no-store" });
+    if (!res.ok) throw new Error("HTTP " + res.status + " for " + url);
+    return res.text();
+  }
+
+  async function fetchJSON(url){
+    const res = await fetch(url, { cache: "no-store" });
+    if (!res.ok) throw new Error("HTTP " + res.status + " for " + url);
+    return res.json();
+  }
+
+  function extractQuizAPIURL(pageHTML){
+    const direct = pageHTML.match(/fetch\(\s*['\"]([^'\"]*\/api\/getLatestQuiz[^'\"]*)['\"]\s*\)/i);
+    if (direct && direct[1]) return direct[1];
+
+    const generic = pageHTML.match(/['\"](https?:\/\/[^'\"]+\/api\/getLatestQuiz[^'\"]*)['\"]/i);
+    if (generic && generic[1]) return generic[1];
+
+    throw new Error("Could not find getLatestQuiz endpoint in page source.");
+  }
+
+  async function autoLoad(){
+    renderLoading();
+    try {
+      const pageHTML = await fetchText(QUIZ_PAGE_URL);
+      const apiURL = extractQuizAPIURL(pageHTML);
+      const apiData = await fetchJSON(apiURL);
+      const parsed = parseQuizAPIData(apiData);
+      buildSlides(parsed, "Loaded from " + apiURL);
+      renderCurrent();
+      return;
+    } catch (discoverErr) {
+      try {
+        const apiDataDirect = await fetchJSON(DIRECT_QUIZ_API_URL);
+        const parsedDirect = parseQuizAPIData(apiDataDirect);
+        buildSlides(parsedDirect, "Loaded from " + DIRECT_QUIZ_API_URL);
+        renderCurrent();
+        return;
+      } catch (directErr) {
+        try {
+          const apiDataProxy = await fetchJSON(SAME_ORIGIN_PROXY_API_URL);
+          const parsedProxy = parseQuizAPIData(apiDataProxy);
+          buildSlides(parsedProxy, "Loaded from local proxy");
+          renderCurrent();
+          return;
+        } catch (proxyErr) {
+          const details =
+            "discovery: " + (discoverErr && discoverErr.message ? discoverErr.message : String(discoverErr)) +
+            " | direct: " + (directErr && directErr.message ? directErr.message : String(directErr)) +
+            " | proxy: " + (proxyErr && proxyErr.message ? proxyErr.message : String(proxyErr));
+          renderLoadError(new Error(details));
+        }
+      }
+    }
+  }
+
+  function buildSlides(parsed, label){
+    sourceLabel = label;
+    slides = [];
+    slides.push({ type: "title", title: parsed.title, notes: parsed.notes });
+    parsed.questions.forEach(q => {
+      slides.push({
+        type: "question",
+        number: q.number,
+        questionHTML: q.questionHTML,
+        answerHTML: q.answerHTML,
+        revealed: false,
+        mark: null
+      });
+    });
+    slides.push({ type: "final" });
+    current = 0;
+    maxVisitedQuestionIndex = 0;
+  }
+
+  function clearAutoAdvance(){
+    if (advanceTimer) {
+      clearTimeout(advanceTimer);
+      advanceTimer = null;
+    }
+  }
+
+  function scheduleAutoAdvance(){
+    clearAutoAdvance();
+    const prefersReduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const delayMs = prefersReduced ? 250 : 700;
+    const atIndex = current;
+
+    advanceTimer = setTimeout(() => {
+      const slide = slides[atIndex];
+      if (current === atIndex && slide && slide.type === "question" && slide.revealed && slide.mark) {
+        goTo(atIndex + 1);
+      }
+    }, delayMs);
+  }
+
+  function renderLoading(){
+    clearAutoAdvance();
+    scoreboard.style.display = "none";
+    progressFill.style.width = "0%";
+    stage.innerHTML =
+      '<div class="slideInner">' +
+        '<div class="spinner"></div>' +
+        '<div class="statusLine"><span class="dot"></span> Fetching this week\'s fifty...</div>' +
+      '</div>';
+  }
+
+  function renderLoadError(err){
+    clearAutoAdvance();
+    scoreboard.style.display = "none";
+
+    stage.innerHTML =
+      '<div class="panel">' +
+        '<h2>Could not auto-load this week\'s quiz</h2>' +
+        '<p>Could not complete page -> endpoint discovery -> API load (<code>' + escapeHTML(err.message || String(err)) + '</code>). This is usually CORS, endpoint changes, or temporary server issues.</p>' +
+        '<p><b>Quick fix: paste the quiz content</b></p>' +
+        '<ol>' +
+          '<li>Open <code>theweeklyfifty.com.au/this-weeks-quiz</code>.</li>' +
+          '<li>Inspect the page and find the <code>quizContainer</code> element.</li>' +
+          '<li>Copy outerHTML and paste it below.</li>' +
+        '</ol>' +
+        '<textarea id="pasteBox" placeholder="Paste quizContainer HTML here..."></textarea>' +
+        '<div class="row">' +
+          '<button class="smallBtn" id="usePasteBtn" type="button">Use Pasted Content</button>' +
+          '<button class="smallBtn secondary" id="retryBtn" type="button">Retry Auto-Load</button>' +
+        '</div>' +
+        '<div class="inlineErr" id="pasteErr"></div>' +
+
+        '<details>' +
+          '<summary>Advanced: custom getLatestQuiz URL</summary>' +
+          '<p style="margin-top:10px;">If you know the latest quiz API endpoint, put it here. It should return a quiz object (or array) with <code>questions</code> that include HTML answers.</p>' +
+          '<p style="margin-top:8px;">For nginx deployments, you can also reverse proxy <code>/api/getLatestQuiz</code> to <code>' + escapeHTML(DIRECT_QUIZ_API_URL) + '</code>. This page will auto-try that path.</p>' +
+          '<div class="row">' +
+            '<input class="smallInput" id="customUrl" type="text" placeholder="https://weeklyfifty-7617b.web.app/api/getLatestQuiz">' +
+            '<button class="smallBtn" id="customFetchBtn" type="button">Fetch</button>' +
+          '</div>' +
+          '<div class="inlineErr" id="customErr"></div>' +
+        '</details>' +
+      '</div>';
+
+    document.getElementById("usePasteBtn").addEventListener("click", () => {
+      const val = document.getElementById("pasteBox").value;
+      const errEl = document.getElementById("pasteErr");
+      try {
+        const parsed = parseQuizHTML(val);
+        if (!parsed.questions.length) throw new Error("No questions found in pasted HTML.");
+        buildSlides(parsed, "Loaded from pasted content");
+        renderCurrent();
+      } catch (e) {
+        errEl.textContent = e.message || String(e);
+        errEl.style.display = "block";
+      }
+    });
+
+    document.getElementById("retryBtn").addEventListener("click", autoLoad);
+
+    document.getElementById("customFetchBtn").addEventListener("click", async () => {
+      const url = document.getElementById("customUrl").value.trim();
+      const errEl = document.getElementById("customErr");
+      errEl.style.display = "none";
+      if (!url) return;
+
+      try {
+        const apiData = await fetchJSON(url);
+        const parsed = parseQuizAPIData(apiData);
+        buildSlides(parsed, "Loaded from custom URL");
+        renderCurrent();
+      } catch (e) {
+        errEl.textContent = e.message || String(e);
+        errEl.style.display = "block";
+      }
+    });
+  }
+
+  function escapeHTML(str){
+    const d = document.createElement("div");
+    d.textContent = str;
+    return d.innerHTML;
+  }
+
+  function totalQuestions(){
+    return slides.filter(s => s.type === "question").length;
+  }
+
+  function scoreSoFar(){
+    return slides.filter(s => s.type === "question" && s.mark === "correct").length;
+  }
+
+  function updateChrome(){
+    const slide = slides[current];
+    if (slide.type === "title") {
+      progressFill.style.width = "0%";
+      scoreboard.style.display = "none";
+      return;
+    }
+
+    if (slide.type === "final") {
+      progressFill.style.width = "100%";
+      scoreboard.style.display = "none";
+      return;
+    }
+
+    const qSlides = slides.filter(s => s.type === "question");
+    const idx = qSlides.indexOf(slide) + 1;
+    progressFill.style.width = (idx / qSlides.length * 100) + "%";
+    scoreboard.style.display = hideLiveScore ? "none" : "flex";
+    scoreVal.textContent = scoreSoFar();
+    scoreTotal.textContent = totalQuestions();
+  }
+
+  function renderCurrent(){
+    const slide = slides[current];
+    updateChrome();
+
+    if (slide.type === "title") {
+      stage.innerHTML =
+        '<div class="slideInner">' +
+          '<h1 class="wordmark">The Weekly Fifty</h1>' +
+          '<p class="subtitle">' + escapeHTML(slide.title) + '</p>' +
+          '<button class="bigBtn" id="startBtn" type="button">Start Quiz</button>' +
+        '</div>';
+
+      document.getElementById("startBtn").addEventListener("click", () => goTo(current + 1));
+      return;
+    }
+
+    if (slide.type === "question") {
+      const canGoNext = current < maxVisitedQuestionIndex && slides[current + 1] && slides[current + 1].type === "question";
+      stage.innerHTML =
+        '<div class="slideInner">' +
+          '<div class="navCorner">' +
+            '<button class="miniBtn" id="backBtn" type="button">Back</button>' +
+            (canGoNext ? '<button class="miniBtn" id="nextBtn" type="button">Next</button>' : '') +
+          '</div>' +
+          '<button class="miniBtn scoreCorner" id="toggleScoreBtnQ" type="button">Live Score: ' + (hideLiveScore ? "Hidden" : "Visible") + '</button>' +
+          '<div class="qNumber">Question ' + slide.number + '</div>' +
+          '<div class="qText">' + slide.questionHTML + '</div>' +
+          (
+            slide.revealed
+              ? '<div class="answerWrap"><div class="flipCard shown"><div class="answerBox">' +
+                  '<div class="answerLabel">Answer</div>' +
+                  '<div class="answerText">' + slide.answerHTML + '</div>' +
+                '</div></div></div>' +
+                '<div class="markRow">' +
+                  '<button class="markBtn correct' + (slide.mark === "correct" ? " active" : "") + '" data-mark="correct" type="button">Correct</button>' +
+                  '<button class="markBtn incorrect' + (slide.mark === "incorrect" ? " active" : "") + '" data-mark="incorrect" type="button">Incorrect</button>' +
+                '</div>'
+              : '<button class="revealBtn" id="revealBtn" type="button">Reveal Answer</button>'
+          ) +
+        '</div>';
+
+      const rb = document.getElementById("revealBtn");
+      if (rb) rb.addEventListener("click", reveal);
+
+      const backBtn = document.getElementById("backBtn");
+      if (backBtn) backBtn.addEventListener("click", () => goTo(current - 1));
+
+      const nextBtn = document.getElementById("nextBtn");
+      if (nextBtn) nextBtn.addEventListener("click", () => goTo(current + 1));
+
+      const toggleScoreBtnQ = document.getElementById("toggleScoreBtnQ");
+      if (toggleScoreBtnQ) {
+        toggleScoreBtnQ.addEventListener("click", () => {
+          hideLiveScore = !hideLiveScore;
+          renderCurrent();
+        });
+      }
+
+      stage.querySelectorAll(".markBtn").forEach(btn => {
+        btn.addEventListener("click", () => mark(btn.dataset.mark));
+      });
+      return;
+    }
+
+    if (slide.type === "final") {
+      const total = totalQuestions();
+      const score = scoreSoFar();
+      const pct = total ? (score / total * 100) : 0;
+      let verdict;
+
+      if (pct >= 90) verdict = "Certified Fifty legends.";
+      else if (pct >= 70) verdict = "Cracking effort.";
+      else if (pct >= 50) verdict = "Solid showing.";
+      else if (pct >= 30) verdict = "Roughly fifty-fifty.";
+      else verdict = "Tough night, next week is yours.";
+
+      const titleSlide = slides[0];
+      stage.innerHTML =
+        '<div class="slideInner">' +
+          '<div class="qNumber">Final Score</div>' +
+          '<div class="finalScore">' + score + ' / ' + total + '</div>' +
+          '<div class="finalVerdict">' + verdict + '</div>' +
+          (titleSlide.notes ? '<div class="finalNotes">' + titleSlide.notes + '</div>' : "") +
+          '<button class="ghostBtn" id="restartBtn" type="button">Restart Quiz</button>' +
+        '</div>';
+
+      document.getElementById("restartBtn").addEventListener("click", () => {
+        slides.forEach(s => {
+          if (s.type === "question") {
+            s.revealed = false;
+            s.mark = null;
+          }
+        });
+        clearAutoAdvance();
+        goTo(0);
+      });
+    }
+  }
+
+  function reveal(){
+    const slide = slides[current];
+    if (slide.type !== "question") return;
+    slide.revealed = true;
+    renderCurrent();
+  }
+
+  function mark(value){
+    const slide = slides[current];
+    if (slide.type !== "question" || !slide.revealed) return;
+    slide.mark = value;
+    renderCurrent();
+    scheduleAutoAdvance();
+  }
+
+  function goTo(index){
+    if (index < 0 || index >= slides.length) return;
+    clearAutoAdvance();
+    current = index;
+    if (slides[current] && slides[current].type === "question" && current > maxVisitedQuestionIndex) {
+      maxVisitedQuestionIndex = current;
+    }
+    renderCurrent();
+  }
+
+  document.addEventListener("keydown", (e) => {
+    if (!slides.length) return;
+    const slide = slides[current];
+
+    if (e.code === "Space" || e.code === "ArrowRight") {
+      e.preventDefault();
+      if (slide.type === "title") goTo(current + 1);
+      else if (slide.type === "question") {
+        if (!slide.revealed) reveal();
+        else goTo(current + 1);
+      }
+    } else if (e.code === "ArrowLeft") {
+      e.preventDefault();
+      goTo(current - 1);
+    } else if (e.key === "c" || e.key === "C") {
+      if (slide.type === "question" && slide.revealed) mark("correct");
+    } else if (e.key === "x" || e.key === "X") {
+      if (slide.type === "question" && slide.revealed) mark("incorrect");
+    }
+  });
+
+  let touchStartX = 0;
+  let touchStartY = 0;
+
+  document.addEventListener("touchstart", (e) => {
+    if (!e.changedTouches || !e.changedTouches[0]) return;
+    touchStartX = e.changedTouches[0].clientX;
+    touchStartY = e.changedTouches[0].clientY;
+  }, { passive: true });
+
+  document.addEventListener("touchend", (e) => {
+    if (!slides.length || !e.changedTouches || !e.changedTouches[0]) return;
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    const dy = e.changedTouches[0].clientY - touchStartY;
+
+    if (Math.abs(dx) < 60 || Math.abs(dy) > 40) return;
+    if (dx < 0) goTo(current + 1);
+    if (dx > 0) goTo(current - 1);
+  }, { passive: true });
+
+  autoLoad();
+})();
+</script>
+</body>
+</html>
