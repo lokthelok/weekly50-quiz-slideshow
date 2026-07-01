@@ -272,6 +272,43 @@
 
   .answerText ul{margin:6px 0 0; padding-left:0; list-style:none;}
   .answerText li{margin-bottom:4px; text-align:center; list-style:none;}
+  .answerText.listReveal li{
+    display:none;
+    opacity:0;
+    transition:opacity 0.3s ease;
+  }
+  .answerText.listReveal li.revealed{
+    display:block;
+    opacity:0;
+  }
+  .answerText.listReveal li.revealed.show{
+    opacity:1;
+  }
+
+  .listRevealLoader{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:4px;
+    margin-top:8px;
+    min-height:18px;
+    color:var(--muted);
+  }
+  .listRevealLoader .dotChar{
+    display:inline-block;
+    font-size:20px;
+    line-height:1;
+    animation:listRevealDot 0.9s ease-in-out infinite;
+  }
+  .listRevealLoader .dotChar:nth-child(2){animation-delay:0.15s;}
+  .listRevealLoader .dotChar:nth-child(3){animation-delay:0.3s;}
+  .listRevealLoader.done{opacity:0; transition:opacity 0.2s ease;}
+
+  @keyframes listRevealDot{
+    0%, 100%{transform:translateY(0); opacity:0.55;}
+    35%{transform:translateY(-4px); opacity:1;}
+    70%{transform:translateY(0); opacity:0.75;}
+  }
 
   .markRow{
     margin-top:26px;
@@ -280,6 +317,8 @@
     gap:14px;
     flex-wrap:wrap;
   }
+
+  .markRow.hidden{display:none;}
 
   .markBtn{
     min-height:56px;
@@ -488,6 +527,8 @@
   let hideLiveScore = false;
   let advanceTimer = null;
   let maxVisitedQuestionIndex = 0;
+  let listRevealTimers = [];
+  let listRevealLoaderTimer = null;
 
   const stage = document.getElementById("stage");
   const progressFill = document.getElementById("progressFill");
@@ -669,6 +710,7 @@
         questionHTML: q.questionHTML,
         answerHTML: q.answerHTML,
         revealed: false,
+        listRevealPending: false,
         mark: null
       });
     });
@@ -682,6 +724,88 @@
       clearTimeout(advanceTimer);
       advanceTimer = null;
     }
+  }
+
+  function clearListRevealTimers(){
+    listRevealTimers.forEach(timer => clearTimeout(timer));
+    listRevealTimers = [];
+    if (listRevealLoaderTimer) {
+      clearTimeout(listRevealLoaderTimer);
+      listRevealLoaderTimer = null;
+    }
+  }
+
+  function reserveListRevealHeight(answerText){
+    const clone = answerText.cloneNode(true);
+    clone.classList.remove("listReveal");
+    clone.querySelectorAll("li").forEach(li => {
+      li.style.display = "block";
+      li.style.opacity = "1";
+    });
+    clone.querySelectorAll(".listRevealLoader").forEach(loader => loader.remove());
+    clone.style.position = "absolute";
+    clone.style.visibility = "hidden";
+    clone.style.pointerEvents = "none";
+    clone.style.left = "-9999px";
+    clone.style.top = "0";
+    clone.style.width = Math.ceil(answerText.getBoundingClientRect().width) + "px";
+    clone.style.minHeight = "0";
+    clone.style.height = "auto";
+    document.body.appendChild(clone);
+    const height = clone.getBoundingClientRect().height;
+    clone.remove();
+    answerText.style.minHeight = height + "px";
+  }
+
+  function setupListReveal(slide){
+    clearListRevealTimers();
+
+    if (!slide.listRevealPending) return;
+
+    const answerText = stage.querySelector(".answerText");
+    const markRow = stage.querySelector(".markRow");
+    if (!answerText) return;
+
+    const items = Array.from(answerText.querySelectorAll("li"));
+    if (!items.length) {
+      if (markRow) markRow.classList.remove("hidden");
+      return;
+    }
+
+    answerText.classList.add("listReveal");
+
+    const loader = document.createElement("div");
+    loader.className = "listRevealLoader";
+    loader.innerHTML = '<span class="dotChar">.</span><span class="dotChar">.</span><span class="dotChar">.</span>';
+    answerText.appendChild(loader);
+    reserveListRevealHeight(answerText);
+
+    const revealItem = (item) => {
+      item.classList.add("revealed");
+      window.requestAnimationFrame(() => {
+        item.classList.add("show");
+      });
+    };
+
+    revealItem(items[0]);
+
+    for (let index = 1; index < items.length; index++) {
+      const item = items[index];
+      const timer = window.setTimeout(() => {
+        revealItem(item);
+
+        if (index === items.length - 1) {
+          listRevealLoaderTimer = window.setTimeout(() => {
+            loader.classList.add("done");
+            if (markRow) markRow.classList.remove("hidden");
+            listRevealLoaderTimer = null;
+          }, 350);
+        }
+      }, index * 2000);
+      listRevealTimers.push(timer);
+    }
+
+    slide.listRevealPending = false;
   }
 
   function scheduleAutoAdvance(){
@@ -815,6 +939,7 @@
   function renderCurrent(){
     const slide = slides[current];
     updateChrome();
+    clearListRevealTimers();
 
     if (slide.type === "title") {
       stage.innerHTML =
@@ -845,7 +970,7 @@
                   '<div class="answerLabel">Answer</div>' +
                   '<div class="answerText">' + slide.answerHTML + '</div>' +
                 '</div></div></div>' +
-                '<div class="markRow">' +
+                '<div class="markRow' + (slide.listRevealPending ? ' hidden' : '') + '">' +
                   '<button class="markBtn correct' + (slide.mark === "correct" ? " active" : "") + '" data-mark="correct" type="button">Correct</button>' +
                   '<button class="markBtn incorrect' + (slide.mark === "incorrect" ? " active" : "") + '" data-mark="incorrect" type="button">Incorrect</button>' +
                 '</div>'
@@ -873,6 +998,8 @@
       stage.querySelectorAll(".markBtn").forEach(btn => {
         btn.addEventListener("click", () => mark(btn.dataset.mark));
       });
+
+      setupListReveal(slide);
       return;
     }
 
@@ -915,6 +1042,7 @@
     const slide = slides[current];
     if (slide.type !== "question") return;
     slide.revealed = true;
+    slide.listRevealPending = true;
     renderCurrent();
   }
 
