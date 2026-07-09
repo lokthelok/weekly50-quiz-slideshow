@@ -369,6 +369,49 @@
     letter-spacing:normal;
   }
 
+  .confettiLayer{
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    z-index:30;
+    overflow:hidden;
+  }
+
+  .confettiBurst{
+    position:absolute;
+    width:0;
+    height:0;
+  }
+
+  .confettiBurst.left{left:0; bottom:0;}
+  .confettiBurst.right{right:0; bottom:0;}
+
+  .confettiPiece{
+    position:absolute;
+    left:0;
+    bottom:0;
+    width:8px;
+    height:12px;
+    border-radius:2px;
+    background:var(--piece-color, var(--text));
+    transform:translate(0, 0) rotate(0deg);
+    animation:confettiFly var(--piece-duration, 2.7s) cubic-bezier(.12,.8,.24,1) forwards;
+    animation-delay:var(--piece-delay, 0s);
+    opacity:0;
+  }
+
+  .confettiBurst.right .confettiPiece{
+    left:auto;
+    right:0;
+  }
+
+  @keyframes confettiFly{
+    0%{transform:translate(0, 0) rotate(0deg) scale(0.7); opacity:1;}
+    22%{opacity:1;}
+    82%{opacity:1;}
+    100%{transform:translate(var(--piece-x, 0px), var(--piece-y, -760px)) rotate(var(--piece-rotate, 1440deg)) scale(0.7); opacity:0;}
+  }
+
   .finalScore{
     margin:10px 0 4px;
     font-size:clamp(60px,12vw,140px);
@@ -529,6 +572,7 @@
   let maxVisitedQuestionIndex = 0;
   let listRevealTimers = [];
   let listRevealLoaderTimer = null;
+  let confettiLock = false;
 
   const stage = document.getElementById("stage");
   const progressFill = document.getElementById("progressFill");
@@ -612,9 +656,12 @@
       throw new Error("Quiz API response did not contain questions.");
     }
 
+    const quizId = quiz.quizId !== undefined && quiz.quizId !== null ? quiz.quizId : quiz.quiz_id;
     const titleParts = [];
-    if (quiz.quiz_id !== undefined && quiz.quiz_id !== null) {
-      titleParts.push("Quiz " + String(quiz.quiz_id));
+    if (quiz.quizTitle) {
+      titleParts.push(String(quiz.quizTitle));
+    } else if (quizId !== undefined && quizId !== null) {
+      titleParts.push("Quiz " + String(quizId));
     }
     const deployed = formatDeploymentDate(quiz.deploymentDate);
     if (deployed) titleParts.push(deployed);
@@ -733,6 +780,85 @@
       clearTimeout(listRevealLoaderTimer);
       listRevealLoaderTimer = null;
     }
+  }
+
+  function launchConfettiCannon(){
+    if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (confettiLock) return;
+
+    confettiLock = true;
+
+    const layer = document.createElement("div");
+    layer.className = "confettiLayer";
+
+    const colors = ["#fbe2df", "#4cfbab", "#f78da7", "#ffd166", "#8ecae6"];
+    const burstConfigs = [
+      {
+        side: "left",
+        horizontalBase: [280, 640],
+        verticalBase: [-420, -980]
+      },
+      {
+        side: "right",
+        horizontalBase: [280, 640],
+        verticalBase: [-420, -980]
+      }
+    ];
+
+    burstConfigs.forEach(config => {
+      const burst = document.createElement("div");
+      burst.className = "confettiBurst " + config.side;
+
+      const pieceCount = 52;
+      for (let index = 0; index < pieceCount; index++) {
+        const piece = document.createElement("span");
+        const spreadX = config.horizontalBase[0] + Math.random() * (config.horizontalBase[1] - config.horizontalBase[0]);
+        const spreadY = config.verticalBase[0] - Math.random() * (Math.abs(config.verticalBase[1]) - Math.abs(config.verticalBase[0]));
+        const directionJitter = config.side === "left" ? 1 : -1;
+        const skew = (Math.random() > 0.5 ? 1 : -1) * (240 + Math.random() * 900);
+        const shapeSeed = index % 5;
+
+        piece.className = "confettiPiece";
+        piece.style.setProperty("--piece-color", colors[index % colors.length]);
+        piece.style.setProperty("--piece-x", (spreadX * directionJitter) + "px");
+        piece.style.setProperty("--piece-y", spreadY + "px");
+        piece.style.setProperty("--piece-rotate", skew + "deg");
+        piece.style.setProperty("--piece-duration", (2.1 + Math.random() * 1.1) + "s");
+        piece.style.setProperty("--piece-delay", (Math.random() * 0.16) + "s");
+        piece.style.left = (6 + Math.random() * 24) + "px";
+        piece.style.bottom = (6 + Math.random() * 16) + "px";
+        piece.style.width = (5 + Math.random() * 6) + "px";
+        piece.style.height = (7 + Math.random() * 8) + "px";
+        piece.style.transform = "rotate(" + (Math.random() * 70 - 35) + "deg)";
+
+        if (shapeSeed === 0) {
+          piece.style.borderRadius = "999px";
+          piece.style.height = (6 + Math.random() * 7) + "px";
+          piece.style.width = (6 + Math.random() * 8) + "px";
+        } else if (shapeSeed === 1) {
+          piece.style.borderRadius = "2px";
+        } else if (shapeSeed === 2) {
+          piece.style.borderRadius = "0";
+          piece.style.clipPath = "polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)";
+        } else if (shapeSeed === 3) {
+          piece.style.borderRadius = "0";
+          piece.style.clipPath = "polygon(50% 0%, 100% 100%, 0% 100%)";
+        } else {
+          piece.style.borderRadius = "999px 2px 999px 2px";
+        }
+
+        burst.appendChild(piece);
+      }
+
+      layer.appendChild(burst);
+    });
+
+    document.body.appendChild(layer);
+
+    window.setTimeout(() => {
+      layer.remove();
+      confettiLock = false;
+    }, 4400);
   }
 
   function reserveListRevealHeight(answerText){
@@ -1030,6 +1156,7 @@
           if (s.type === "question") {
             s.revealed = false;
             s.mark = null;
+            s.confettiTriggered = false;
           }
         });
         clearAutoAdvance();
@@ -1050,6 +1177,10 @@
     const slide = slides[current];
     if (slide.type !== "question" || !slide.revealed) return;
     slide.mark = value;
+    if ((String(slide.number) === "25" || String(slide.number) === "50") && !slide.confettiTriggered) {
+      slide.confettiTriggered = true;
+      launchConfettiCannon();
+    }
     renderCurrent();
     scheduleAutoAdvance();
   }
