@@ -1,0 +1,288 @@
+[
+  {
+    "quizId": 210,
+    "isPremium": false,
+    "isActive": true,
+    "quizType": 1,
+    "deploymentDate": "2026-07-09T20:00:00.000Z",
+    "layout": [
+      {"id": "mock_a", "type": "logo"},
+      {"id": "mock_b", "type": "titleDate"},
+      {"id": "mock_c", "type": "quiz", "showReplay": true, "showInfo": true, "showDownload": true},
+      {"id": "mock_d", "type": "note", "content": ""},
+      {"id": "mock_e", "type": "note", "content": "<p>Local fixture for testing the quiz harness.</p>"}
+    ],
+    "theme": {
+      "fontColor": "#fbe2df",
+      "backgroundColor": "#677c73",
+      "tertiaryColor": "#4cfbab"
+    },
+    "quizTitle": "Quiz 210",
+    "quizSlug": "210",
+    "questionCount": 50,
+    "collabId": null,
+    "extraQuestions": [],
+    "submissionFormId": null,
+    "notesAbove": "",
+    "notesBelow": "<p>The Weekly Fifty is written by an AI, who is vibing in a datacenter.</p><p>Our quiz no longer AI-free, and always will be.</p>",
+    "imageUrl": "",
+    "sponsorId": "",
+    "creationTime": {
+      "_seconds": 1782957583,
+      "_nanoseconds": 838000000
+    },
+    "createdBy": "test-fixture",
+    "questions": [
+      {
+        "qNum": 1,
+        "qTitle": "<p>Which planet is known as the Red Planet?</p>",
+        "qAnswer": "<p>Mars</p>"
+      },
+      {
+        "qNum": 2,
+        "qTitle": "<p>How many continents are there on Earth?</p>",
+        "qAnswer": "<p>Seven</p>"
+      },
+      {
+        "qNum": 3,
+        "qTitle": "<p>What is the largest ocean on Earth?</p>",
+        "qAnswer": "<p>The Pacific Ocean</p>"
+      },
+      {
+        "qNum": 4,
+        "qTitle": "<p>What instrument has keys, pedals, and strings?</p>",
+        "qAnswer": "<p>A piano</p>"
+      },
+      {
+        "qNum": 5,
+        "qTitle": "<p>Which metal is liquid at room temperature?</p>",
+        "qAnswer": "<p>Mercury</p>"
+      },
+      {
+        "qNum": 6,
+        "qTitle": "<p>What gas do plants absorb from the atmosphere?</p>",
+        "qAnswer": "<p>Carbon dioxide</p>"
+      },
+      {
+        "qNum": 7,
+        "qTitle": "<p>How many sides does a hexagon have?</p>",
+        "qAnswer": "<p>Six</p>"
+      },
+      {
+        "qNum": 8,
+        "qTitle": "<p>Who wrote <em>Hamlet</em>?</p>",
+        "qAnswer": "<p>William Shakespeare</p>"
+      },
+      {
+        "qNum": 9,
+        "qTitle": "<p>What is the boiling point of water at sea level in Celsius?</p>",
+        "qAnswer": "<p>100&deg;C</p>"
+      },
+      {
+        "qNum": 10,
+        "qTitle": "<p>What shape is a standard stop sign?</p>",
+        "qAnswer": "<p>An octagon</p>"
+      },
+      {
+        "qNum": 11,
+        "qTitle": "<p>Which animal is the largest mammal on Earth?</p>",
+        "qAnswer": "<p>The blue whale</p>"
+      },
+      {
+        "qNum": 12,
+        "qTitle": "<p>What is the square root of 81?</p>",
+        "qAnswer": "<p>Nine</p>"
+      },
+      {
+        "qNum": 13,
+        "qTitle": "<p>Which country is famous for the Eiffel Tower?</p>",
+        "qAnswer": "<p>France</p>"
+      },
+      {
+        "qNum": 14,
+        "qTitle": "<p>What do bees collect to make honey?</p>",
+        "qAnswer": "<p>Nectar</p>"
+      },
+      {
+        "qNum": 15,
+        "qTitle": "<p>How many minutes are in one hour?</p>",
+        "qAnswer": "<p>Sixty</p>"
+      },
+      {
+        "qNum": 16,
+        "qTitle": "<p>Which planet has the most famous rings?</p>",
+        "qAnswer": "<p>Saturn</p>"
+      },
+      {
+        "qNum": 17,
+        "qTitle": "<p>What is the primary language spoken in Brazil?</p>",
+        "qAnswer": "<p>Portuguese</p>"
+      },
+      {
+        "qNum": 18,
+        "qTitle": "<p>Which holiday is celebrated on 25 December?</p>",
+        "qAnswer": "<p>Christmas Day</p>"
+      },
+      {
+        "qNum": 19,
+        "qTitle": "<p>What is the chemical symbol for gold?</p>",
+        "qAnswer": "<p>Au</p>"
+      },
+      {
+        "qNum": 20,
+        "qTitle": "<p>Which part of the plant carries water from the roots?</p>",
+        "qAnswer": "<p>The stem</p>"
+      },
+      {
+        "qNum": 21,
+        "qTitle": "<p>How many days are there in a leap year?</p>",
+        "qAnswer": "<p>366</p>"
+      },
+      {
+        "qNum": 22,
+        "qTitle": "<p>Which musician is known as the King of Pop?</p>",
+        "qAnswer": "<p>Michael Jackson</p>"
+      },
+      {
+        "qNum": 23,
+        "qTitle": "<p>What is the tallest type of tree?</p>",
+        "qAnswer": "<p>The redwood</p>"
+      },
+      {
+        "qNum": 24,
+        "qTitle": "<p>Which ocean lies on the east coast of Australia?</p>",
+        "qAnswer": "<p>The Pacific Ocean</p>"
+      },
+      {
+        "qNum": 25,
+        "qTitle": "<p>What is 5 + 5?</p>",
+        "qAnswer": "<p>10</p>"
+      },
+      {
+        "qNum": 26,
+        "qTitle": "<p>Which metal is used in a common household thermometer, though it is now less common for safety reasons?</p>",
+        "qAnswer": "<p>Mercury</p>"
+      },
+      {
+        "qNum": 27,
+        "qTitle": "<p>How many planets are in the solar system?</p>",
+        "qAnswer": "<p>Eight</p>"
+      },
+      {
+        "qNum": 28,
+        "qTitle": "<p>What is the capital of Japan?</p>",
+        "qAnswer": "<p>Tokyo</p>"
+      },
+      {
+        "qNum": 29,
+        "qTitle": "<p>Which gas makes up most of Earth's atmosphere?</p>",
+        "qAnswer": "<p>Nitrogen</p>"
+      },
+      {
+        "qNum": 30,
+        "qTitle": "<p>What is the smallest prime number?</p>",
+        "qAnswer": "<p>2</p>"
+      },
+      {
+        "qNum": 31,
+        "qTitle": "<p>What is the name of the galaxy that contains Earth?</p>",
+        "qAnswer": "<p>The Milky Way</p>"
+      },
+      {
+        "qNum": 32,
+        "qTitle": "<p>Which ocean is on the west coast of the United States?</p>",
+        "qAnswer": "<p>The Pacific Ocean</p>"
+      },
+      {
+        "qNum": 33,
+        "qTitle": "<p>What organ pumps blood through the human body?</p>",
+        "qAnswer": "<p>The heart</p>"
+      },
+      {
+        "qNum": 34,
+        "qTitle": "<p>What is the process by which plants make their own food called?</p>",
+        "qAnswer": "<p>Photosynthesis</p>"
+      },
+      {
+        "qNum": 35,
+        "qTitle": "<p>Which city is known as the Big Apple?</p>",
+        "qAnswer": "<p>New York City</p>"
+      },
+      {
+        "qNum": 36,
+        "qTitle": "<p>How many cards are there in a standard deck without jokers?</p>",
+        "qAnswer": "<p>52</p>"
+      },
+      {
+        "qNum": 37,
+        "qTitle": "<p>What is the hardest natural substance on Earth?</p>",
+        "qAnswer": "<p>Diamond</p>"
+      },
+      {
+        "qNum": 38,
+        "qTitle": "<p>Which continent is the Sahara Desert on?</p>",
+        "qAnswer": "<p>Africa</p>"
+      },
+      {
+        "qNum": 39,
+        "qTitle": "<p>What is the freezing point of water in Celsius?</p>",
+        "qAnswer": "<p>0&deg;C</p>"
+      },
+      {
+        "qNum": 40,
+        "qTitle": "<p>Which sport uses a racket and a shuttlecock?</p>",
+        "qAnswer": "<p>Badminton</p>"
+      },
+      {
+        "qNum": 41,
+        "qTitle": "<p>What is the largest internal organ in the human body?</p>",
+        "qAnswer": "<p>The liver</p>"
+      },
+      {
+        "qNum": 42,
+        "qTitle": "<p>Which planet is closest to the Sun?</p>",
+        "qAnswer": "<p>Mercury</p>"
+      },
+      {
+        "qNum": 43,
+        "qTitle": "<p>How many letters are in the English alphabet?</p>",
+        "qAnswer": "<p>26</p>"
+      },
+      {
+        "qNum": 44,
+        "qTitle": "<p>What is the main ingredient in guacamole?</p>",
+        "qAnswer": "<p>Avocado</p>"
+      },
+      {
+        "qNum": 45,
+        "qTitle": "<p>Which language is primarily spoken in Spain?</p>",
+        "qAnswer": "<p>Spanish</p>"
+      },
+      {
+        "qNum": 46,
+        "qTitle": "<p>What is the square of 12?</p>",
+        "qAnswer": "<p>144</p>"
+      },
+      {
+        "qNum": 47,
+        "qTitle": "<p>Which bird is often associated with delivering babies in folklore?</p>",
+        "qAnswer": "<p>The stork</p>"
+      },
+      {
+        "qNum": 48,
+        "qTitle": "<p>What is the longest river in the world often cited in school quizzes?</p>",
+        "qAnswer": "<p>The Nile</p>"
+      },
+      {
+        "qNum": 49,
+        "qTitle": "<p>Which instrument has 88 keys?</p>",
+        "qAnswer": "<p>A piano</p>"
+      },
+      {
+        "qNum": 50,
+        "qTitle": "<p>What is 100 divided by 4?</p>",
+        "qAnswer": "<p>25</p>"
+      }
+    ]
+  }
+]

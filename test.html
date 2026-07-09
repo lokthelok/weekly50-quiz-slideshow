@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weekly Fifty Test Harness</title>
+<style>
+  :root{
+    color-scheme: dark;
+    --bg:#0c1220;
+    --panel:#11192b;
+    --panel-2:#18233b;
+    --text:#f4efe8;
+    --muted:rgba(244,239,232,0.72);
+    --line:rgba(244,239,232,0.14);
+    --accent:#8ecae6;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    display:flex;
+    overflow:hidden;
+    background:
+      radial-gradient(circle at top left, rgba(142,202,230,0.12), transparent 32%),
+      radial-gradient(circle at bottom right, rgba(76,251,171,0.10), transparent 28%),
+      var(--bg);
+    color:var(--text);
+    font-family:Helvetica,Verdana,Arial,sans-serif;
+  }
+
+  .shell{
+    flex:1;
+    min-height:0;
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+    padding:16px;
+  }
+
+  .banner{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px 14px;
+    align-items:center;
+    justify-content:space-between;
+    padding:14px 16px;
+    border:1px solid var(--line);
+    border-radius:14px;
+    background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+    backdrop-filter: blur(10px);
+  }
+
+  .banner strong{
+    font-size:14px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+  }
+
+  .banner span{
+    color:var(--muted);
+    font-size:13px;
+  }
+
+  #status{
+    padding:10px 14px;
+    border-radius:10px;
+    background:var(--panel);
+    border:1px solid var(--line);
+    color:var(--muted);
+    font-size:13px;
+  }
+
+  .frameWrap{
+    flex:1;
+    min-height:0;
+    display:flex;
+    flex-direction:column;
+    border-radius:18px;
+    overflow:hidden;
+    border:1px solid var(--line);
+    background:var(--panel-2);
+    box-shadow:0 24px 70px rgba(0,0,0,0.35);
+  }
+
+  iframe{
+    display:block;
+    flex:1;
+    min-height:0;
+    width:100%;
+    height:100%;
+    border:0;
+    background:#677c73;
+  }
+
+  .hint{
+    color:var(--muted);
+    font-size:12px;
+  }
+
+  code{
+    color:var(--accent);
+  }
+</style>
+</head>
+<body>
+  <div class="shell">
+    <div class="banner">
+      <strong>Weekly Fifty test harness</strong>
+      <span>Loads <code>index.html</code> and mocks <code>/api/getLatestQuiz</code> from <code>test-quiz-data.json</code>.</span>
+    </div>
+    <div id="status">Loading harness...</div>
+    <div class="frameWrap">
+      <iframe id="preview" title="Weekly Fifty quiz preview"></iframe>
+    </div>
+    <div class="hint">If local file fetches are blocked in your browser, serve this folder with a simple static server and reopen <code>test.html</code>.</div>
+  </div>
+
+  <script>
+    (async () => {
+      const statusEl = document.getElementById("status");
+      const preview = document.getElementById("preview");
+
+      try {
+        statusEl.textContent = "Reading index.html and test-quiz-data.json...";
+
+        const [indexHTML, quizDataText] = await Promise.all([
+          fetch("./index.html", { cache: "no-store" }).then(response => {
+            if (!response.ok) throw new Error("Failed to load index.html: HTTP " + response.status);
+            return response.text();
+          }),
+          fetch("./test-quiz-data.json", { cache: "no-store" }).then(response => {
+            if (!response.ok) throw new Error("Failed to load test-quiz-data.json: HTTP " + response.status);
+            return response.text();
+          })
+        ]);
+
+        const mockQuizPageHTML = '<!doctype html><html><head><meta charset="utf-8"><title>Mock Quiz Page</title></head><body><div>Mock quiz page</div></body></html>';
+        const sourceDoc = new DOMParser().parseFromString(indexHTML, "text/html");
+        const prelude = sourceDoc.createElement("script");
+        prelude.textContent = [
+          "(function(){",
+          "  const originalFetch = window.fetch.bind(window);",
+          "  const mockQuizPageHTML = " + JSON.stringify(mockQuizPageHTML) + ";",
+          "  const mockQuizData = " + JSON.stringify(quizDataText) + ";",
+          "  const pageUrl = 'https://theweeklyfifty.com.au/this-weeks-quiz/';",
+          "  const apiPattern = /\\/api\\/getLatestQuiz/;",
+          "  window.fetch = function(input, init){",
+          "    const url = typeof input === 'string' ? input : (input && input.url ? input.url : String(input));",
+          "    if (url === pageUrl) {",
+          "      return Promise.resolve(new Response(mockQuizPageHTML, { status: 200, headers: { 'Content-Type': 'text/html; charset=utf-8' } }));",
+          "    }",
+          "    if (apiPattern.test(url)) {",
+          "      return Promise.resolve(new Response(mockQuizData, { status: 200, headers: { 'Content-Type': 'application/json; charset=utf-8' } }));",
+          "    }",
+          "    return originalFetch(input, init);",
+          "  };",
+          "})();"
+        ].join("\n");
+
+        sourceDoc.head.insertBefore(prelude, sourceDoc.head.firstChild);
+
+        preview.srcdoc = "<!doctype html>\n" + sourceDoc.documentElement.outerHTML;
+
+        statusEl.textContent = "Harness ready. Open the embedded quiz below.";
+      } catch (error) {
+        statusEl.textContent = "Failed to initialize harness: " + (error && error.message ? error.message : String(error));
+      }
+    })();
+  </script>
+</body>
+</html>
