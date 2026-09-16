@@ -404,14 +404,17 @@
     top:12px;
     left:12px;
     z-index:40;
-    width:44px;
+    min-width:44px;
     height:44px;
-    padding:0;
+    padding:0 10px;
     border-radius:999px;
     border:1px solid rgba(251,226,223,0.25);
     background:rgba(0,7,22,0.22);
     color:rgba(251,226,223,0.5);
-    font-size:11px;
+    font-size:10px;
+    font-weight:700;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
     line-height:1;
     backdrop-filter:blur(10px);
     opacity:0.3;
@@ -741,7 +744,7 @@
 </head>
 <body>
 
-<button id="crazyToggle" class="crazyToggle" type="button" aria-label="Enable crazy mode" aria-pressed="false" title="Toggle crazy mode">✦</button>
+<button id="crazyToggle" class="crazyToggle" type="button" aria-label="Enable crazy mode" aria-pressed="false" title="Toggle crazy mode">Crazy</button>
 
 <div id="app">
   <div id="progressTrack"><div id="progressFill"></div></div>
@@ -1179,7 +1182,7 @@
         '<div class="spinner"></div>' +
         '<div class="statusLine"><span class="dot"></span> Fetching this week\'s fifty...</div>' +
       '</div>';
-    refreshCrazyPresentation();
+    refreshCrazyPresentation({ rerandomizeFonts: true, fontRoots: [stage, scoreboard, progressFill.parentElement, crazyToggle] });
   }
 
   function renderLoadError(err){
@@ -1248,7 +1251,7 @@
       }
     });
 
-    refreshCrazyPresentation();
+    refreshCrazyPresentation({ rerandomizeFonts: true, fontRoots: [stage, scoreboard, progressFill.parentElement, crazyToggle] });
   }
 
   function escapeHTML(str){
@@ -1271,7 +1274,20 @@
     return CRAZY_CONTROL_FONTS[Math.floor(Math.random() * CRAZY_CONTROL_FONTS.length)];
   }
 
-  function randomizeVisibleFonts(){
+  function setFontOnSelector(root, selector, font){
+    if (root.matches && root.matches(selector)) {
+      root.style.fontFamily = font;
+      root.setAttribute("data-crazy-font", "true");
+    }
+    if (!root.querySelectorAll) return;
+    root.querySelectorAll(selector).forEach(el => {
+      if (el.tagName === "SCRIPT" || el.tagName === "STYLE") return;
+      el.style.fontFamily = font;
+      el.setAttribute("data-crazy-font", "true");
+    });
+  }
+
+  function randomizeFontsInRoots(roots){
     const groups = [
       { selector: "body", font: randomCrazyFont() },
       { selector: "#scoreboard, #scoreboard *", font: randomCrazyControlFont() },
@@ -1280,18 +1296,17 @@
       { selector: ".qText, .qText *, .answerLabel, .answerText, .answerText *, .finalNotes, .statusLine, .panel h2, .panel p, .panel li", font: randomCrazyFont() }
     ];
 
-    groups.forEach(group => {
-      document.querySelectorAll(group.selector).forEach(el => {
+    roots.forEach(root => {
+      groups.forEach(group => {
+        setFontOnSelector(root, group.selector, group.font);
+      });
+
+      if (!root.querySelectorAll) return;
+      root.querySelectorAll("*:not([data-crazy-font])").forEach(el => {
         if (el.tagName === "SCRIPT" || el.tagName === "STYLE") return;
-        el.style.fontFamily = group.font;
+        el.style.fontFamily = randomCrazyFont();
         el.setAttribute("data-crazy-font", "true");
       });
-    });
-
-    document.querySelectorAll("body *:not([data-crazy-font])").forEach(el => {
-      if (el.tagName === "SCRIPT" || el.tagName === "STYLE") return;
-      el.style.fontFamily = randomCrazyFont();
-      el.setAttribute("data-crazy-font", "true");
     });
   }
 
@@ -1398,9 +1413,11 @@
     if (!buttons.length) return;
 
     const viewportKey = window.innerWidth + "x" + window.innerHeight;
-    if (!slide.crazyButtonLayout || slide.crazyButtonLayout.viewportKey !== viewportKey) {
+    const contentKey = slide.number + "|" + slide.revealed + "|" + slide.questionHTML.length + "|" + slide.answerHTML.length;
+    if (!slide.crazyButtonLayout || slide.crazyButtonLayout.viewportKey !== viewportKey || slide.crazyButtonLayout.contentKey !== contentKey) {
       slide.crazyButtonLayout = {
         viewportKey,
+        contentKey,
         positions: computeCrazyButtonLayout()
       };
     }
@@ -1415,7 +1432,8 @@
     });
   }
 
-  function refreshCrazyPresentation(){
+  function refreshCrazyPresentation(options){
+    const settings = options || {};
     document.body.classList.toggle("crazy-mode", crazyMode);
     syncCrazyToggle();
 
@@ -1425,7 +1443,9 @@
       return;
     }
 
-    randomizeVisibleFonts();
+    if (settings.rerandomizeFonts) {
+      randomizeFontsInRoots(settings.fontRoots || [document.body]);
+    }
     const slide = slides[current];
     if (slide && slide.type === "question" && slide.revealed) {
       applyCrazyButtonLayout(slide);
@@ -1442,7 +1462,7 @@
     if (slides.length && slides[current] && slides[current].type === "question") {
       slides[current].crazyButtonLayout = null;
     }
-    refreshCrazyPresentation();
+    refreshCrazyPresentation({ rerandomizeFonts: crazyMode, fontRoots: [document.body] });
   }
 
   function totalQuestions(){
@@ -1489,7 +1509,7 @@
         '</div>';
 
       document.getElementById("startBtn").addEventListener("click", () => goTo(current + 1));
-      refreshCrazyPresentation();
+      refreshCrazyPresentation({ rerandomizeFonts: true, fontRoots: [stage, scoreboard, progressFill.parentElement, crazyToggle] });
       return;
     }
 
@@ -1540,7 +1560,7 @@
       });
 
       setupListReveal(slide);
-      refreshCrazyPresentation();
+      refreshCrazyPresentation({ rerandomizeFonts: true, fontRoots: [stage, scoreboard, progressFill.parentElement, crazyToggle] });
       return;
     }
 
@@ -1579,7 +1599,7 @@
         clearAutoAdvance();
         goTo(0);
       });
-      refreshCrazyPresentation();
+      refreshCrazyPresentation({ rerandomizeFonts: true, fontRoots: [stage, scoreboard, progressFill.parentElement, crazyToggle] });
     }
   }
 
