@@ -1295,6 +1295,7 @@
       { selector: ".wordmark, .subtitle, .qNumber, .finalScore, .finalVerdict", font: randomCrazyFont() },
       { selector: ".qText, .qText *, .answerLabel, .answerText, .answerText *, .finalNotes, .statusLine, .panel h2, .panel p, .panel li", font: randomCrazyFont() }
     ];
+    const fallbackSelector = "div, span, p, a, li, ul, ol, em, strong, b";
 
     roots.forEach(root => {
       groups.forEach(group => {
@@ -1302,7 +1303,8 @@
       });
 
       if (!root.querySelectorAll) return;
-      root.querySelectorAll("*:not([data-crazy-font])").forEach(el => {
+      root.querySelectorAll(fallbackSelector).forEach(el => {
+        if (el.getAttribute("data-crazy-font")) return;
         if (el.tagName === "SCRIPT" || el.tagName === "STYLE") return;
         el.style.fontFamily = randomCrazyFont();
         el.setAttribute("data-crazy-font", "true");
@@ -1452,8 +1454,12 @@
       return;
     }
 
-    if (settings.rerandomizeFonts && (!prefersReduced || !document.querySelector("[data-crazy-font]"))) {
-      randomizeFontsInRoots(settings.fontRoots || [document.body]);
+    if (settings.rerandomizeFonts) {
+      const fontRoots = settings.fontRoots || [document.body];
+      const rootsToRandomize = prefersReduced
+        ? fontRoots.filter(root => root === document.body || !(root.querySelector && root.querySelector("[data-crazy-font]")))
+        : fontRoots;
+      if (rootsToRandomize.length) randomizeFontsInRoots(rootsToRandomize);
     }
     const slide = slides[current];
     if (slide && slide.type === "question" && slide.revealed) {
