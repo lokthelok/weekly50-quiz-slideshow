@@ -58,6 +58,16 @@
 
   @media (prefers-reduced-motion: reduce){
     *{animation-duration:0.001ms !important; transition-duration:0.001ms !important;}
+    body.crazy-mode,
+    body.crazy-mode::before,
+    body.crazy-mode::after,
+    body.crazy-mode .bigBtn,
+    body.crazy-mode .ghostBtn,
+    body.crazy-mode .revealBtn,
+    body.crazy-mode .smallBtn,
+    body.crazy-mode .markBtn{
+      animation:none !important;
+    }
   }
 
   button{
@@ -1182,7 +1192,7 @@
         '<div class="spinner"></div>' +
         '<div class="statusLine"><span class="dot"></span> Fetching this week\'s fifty...</div>' +
       '</div>';
-    refreshCrazyPresentation({ rerandomizeFonts: true, fontRoots: [stage, scoreboard, progressFill.parentElement, crazyToggle] });
+    refreshCrazyPresentation({ rerandomizeFonts: true, fontRoots: [stage] });
   }
 
   function renderLoadError(err){
@@ -1251,7 +1261,7 @@
       }
     });
 
-    refreshCrazyPresentation({ rerandomizeFonts: true, fontRoots: [stage, scoreboard, progressFill.parentElement, crazyToggle] });
+    refreshCrazyPresentation({ rerandomizeFonts: true, fontRoots: [stage] });
   }
 
   function escapeHTML(str){
@@ -1345,12 +1355,14 @@
   function chooseCrazyButtonSpot(size, reservedRects, placedRects){
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
-    const xRange = Math.max(1, viewportWidth - size.width - 24);
-    const yRange = Math.max(1, viewportHeight - size.height - 82);
+    const minLeft = 12;
+    const maxLeft = Math.max(minLeft, viewportWidth - size.width - 12);
+    const minTop = 58;
+    const maxTop = Math.max(minTop, viewportHeight - size.height - 24);
 
     for (let attempt = 0; attempt < 120; attempt++) {
-      const left = 12 + Math.random() * xRange;
-      const top = 58 + Math.random() * yRange;
+      const left = minLeft + Math.random() * Math.max(0, maxLeft - minLeft);
+      const top = minTop + Math.random() * Math.max(0, maxTop - minTop);
       const rect = { left, top, right: left + size.width, bottom: top + size.height };
       if (reservedRects.some(area => rectsOverlap(rect, area))) continue;
       if (placedRects.some(area => rectsOverlap(rect, area))) continue;
@@ -1524,7 +1536,7 @@
         '</div>';
 
       document.getElementById("startBtn").addEventListener("click", () => goTo(current + 1));
-      refreshCrazyPresentation({ rerandomizeFonts: true, fontRoots: [stage, scoreboard, progressFill.parentElement, crazyToggle] });
+      refreshCrazyPresentation({ rerandomizeFonts: true, fontRoots: [stage] });
       return;
     }
 
@@ -1575,7 +1587,7 @@
       });
 
       setupListReveal(slide);
-      refreshCrazyPresentation({ rerandomizeFonts: true, fontRoots: [stage, scoreboard, progressFill.parentElement, crazyToggle] });
+      refreshCrazyPresentation({ rerandomizeFonts: true, fontRoots: [stage] });
       return;
     }
 
@@ -1614,7 +1626,7 @@
         clearAutoAdvance();
         goTo(0);
       });
-      refreshCrazyPresentation({ rerandomizeFonts: true, fontRoots: [stage, scoreboard, progressFill.parentElement, crazyToggle] });
+      refreshCrazyPresentation({ rerandomizeFonts: true, fontRoots: [stage] });
     }
   }
 
