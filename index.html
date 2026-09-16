@@ -1446,7 +1446,13 @@
 
     buttons.forEach((btn, index) => {
       const spot = slide.crazyButtonLayout.positions[index];
-      if (!spot) return;
+      if (!spot) {
+        btn.classList.remove("crazyFloat");
+        btn.style.left = "";
+        btn.style.top = "";
+        btn.style.width = "";
+        return;
+      }
       btn.classList.add("crazyFloat");
       btn.style.left = spot.left + "px";
       btn.style.top = spot.top + "px";
@@ -1700,7 +1706,7 @@
     if (dx > 0) goTo(current - 1);
   }, { passive: true });
 
-  window.addEventListener("resize", () => {
+  function handleCrazyViewportChange(){
     if (!crazyMode) return;
     if (crazyResizeTimer) clearTimeout(crazyResizeTimer);
     crazyResizeTimer = window.setTimeout(() => {
@@ -1710,7 +1716,10 @@
       }
       refreshCrazyPresentation();
     }, 120);
-  });
+  }
+
+  window.addEventListener("resize", handleCrazyViewportChange);
+  window.addEventListener("orientationchange", handleCrazyViewportChange);
 
   crazyToggle.addEventListener("click", () => {
     setCrazyMode(!crazyMode);
