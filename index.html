@@ -419,12 +419,18 @@
   }
 
   .crazyToggle:hover,
-  .crazyToggle:focus-visible,
   .crazyToggle[aria-pressed="true"]{
     opacity:0.95;
     transform:scale(1.08);
     border-color:rgba(255,255,255,0.78);
     color:#fff;
+  }
+
+  .crazyToggle:focus-visible{
+    opacity:1;
+    outline:3px solid #fff;
+    outline-offset:2px;
+    box-shadow:0 0 0 6px rgba(0,0,0,0.22), 0 0 22px rgba(255,255,255,0.28);
   }
 
   body.crazy-mode{
@@ -1419,12 +1425,10 @@
     try {
       window.localStorage.setItem(CRAZY_MODE_STORAGE_KEY, crazyMode ? "true" : "false");
     } catch (_) {}
-    if (slides.length && slides[current]) {
-      if (slides[current].type === "question") slides[current].crazyButtonLayout = null;
-      renderCurrent();
-    } else {
-      refreshCrazyPresentation();
+    if (slides.length && slides[current] && slides[current].type === "question") {
+      slides[current].crazyButtonLayout = null;
     }
+    refreshCrazyPresentation();
   }
 
   function totalQuestions(){
