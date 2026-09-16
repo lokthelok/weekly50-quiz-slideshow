@@ -458,20 +458,35 @@
     --line:rgba(123,246,255,0.52);
     --good:#d4ff00;
     --bad:#ff4fd8;
-    background:
-      linear-gradient(120deg, #ff009d 0%, #6e00ff 20%, #00eaff 42%, #fff000 64%, #ff6a00 82%, #ff009d 100%);
-    background-size:300% 300%;
-    animation:crazyBackdrop 14s linear infinite;
+    background:var(--crazy-body-bg, linear-gradient(120deg, #ff009d 0%, #6e00ff 20%, #00eaff 42%, #fff000 64%, #ff6a00 82%, #ff009d 100%));
+    background-size:var(--crazy-body-size, 300% 300%);
+    background-position:center;
+    animation-name:var(--crazy-body-animation, crazyBackdrop);
+    animation-duration:var(--crazy-body-duration, 14s);
+    animation-timing-function:linear;
+    animation-iteration-count:infinite;
+    animation-direction:var(--crazy-body-direction, normal);
   }
 
   body.crazy-mode::before,
   body.crazy-mode::after{
     opacity:1;
-    animation:crazyAurora 11s linear infinite alternate;
+    background:var(--crazy-before-bg, radial-gradient(circle at 20% 20%, rgba(255,0,153,0.42), transparent 24%), radial-gradient(circle at 80% 18%, rgba(0,238,255,0.36), transparent 26%), radial-gradient(circle at 30% 80%, rgba(255,242,0,0.32), transparent 24%), radial-gradient(circle at 75% 70%, rgba(124,77,255,0.36), transparent 24%));
+    background-size:var(--crazy-before-size, 120% 120%);
+    background-position:center;
+    animation-name:var(--crazy-before-animation, crazyAurora);
+    animation-duration:var(--crazy-before-duration, 11s);
+    animation-timing-function:linear;
+    animation-iteration-count:infinite;
+    animation-direction:var(--crazy-before-direction, alternate);
   }
 
   body.crazy-mode::after{
-    animation-duration:18s;
+    background:var(--crazy-after-bg, conic-gradient(from 0deg at 50% 50%, rgba(255,0,106,0.18), rgba(0,255,247,0.18), rgba(255,230,0,0.18), rgba(124,77,255,0.18), rgba(255,0,106,0.18)));
+    background-size:var(--crazy-after-size, 100% 100%);
+    animation-name:var(--crazy-after-animation, crazyPrismShift);
+    animation-duration:var(--crazy-after-duration, 18s);
+    animation-direction:var(--crazy-after-direction, alternate-reverse);
   }
 
   body.crazy-mode #progressTrack,
@@ -543,6 +558,12 @@
     z-index:26;
     max-width:min(260px, 72vw);
     margin:0;
+  }
+
+  body.crazy-mode [data-crazy-motion]{
+    will-change:transform, filter;
+    transform-origin:var(--crazy-origin-x, 50%) var(--crazy-origin-y, 50%);
+    filter:hue-rotate(var(--crazy-hue, 0deg)) saturate(var(--crazy-saturate, 1));
   }
 
   body.crazy-mode .qText,
@@ -742,6 +763,122 @@
     100%{background-position:0% 50%; filter:hue-rotate(0deg);}
   }
 
+  @keyframes crazySpiral{
+    0%{background-position:0% 0%; transform:scale(1) rotate(0deg);}
+    50%{background-position:100% 100%; transform:scale(1.1) rotate(6deg);}
+    100%{background-position:0% 0%; transform:scale(1) rotate(0deg);}
+  }
+
+  @keyframes crazyPrismShift{
+    0%{background-position:0% 50%; filter:hue-rotate(0deg);}
+    50%{background-position:100% 50%; filter:hue-rotate(110deg);}
+    100%{background-position:0% 50%; filter:hue-rotate(0deg);}
+  }
+
+  @keyframes crazyDiagonalRush{
+    0%{background-position:0% 0%; transform:translate3d(0,0,0) scale(1);}
+    50%{background-position:100% 100%; transform:translate3d(2%, -2%, 0) scale(1.08);}
+    100%{background-position:0% 0%; transform:translate3d(0,0,0) scale(1);}
+  }
+
+  @keyframes crazyRippleField{
+    0%{background-size:100% 100%; transform:scale(1);}
+    50%{background-size:145% 145%; transform:scale(1.05);}
+    100%{background-size:100% 100%; transform:scale(1);}
+  }
+
+  @keyframes crazyTunnelZoom{
+    0%{background-size:100% 100%; transform:scale(1) rotate(0deg);}
+    50%{background-size:220% 220%; transform:scale(1.14) rotate(-8deg);}
+    100%{background-size:100% 100%; transform:scale(1) rotate(0deg);}
+  }
+
+  @keyframes crazyWaveBands{
+    0%{background-position:0% 20%; transform:skewX(0deg);}
+    25%{background-position:40% 80%; transform:skewX(3deg);}
+    50%{background-position:100% 30%; transform:skewX(-3deg);}
+    75%{background-position:60% 0%; transform:skewX(2deg);}
+    100%{background-position:0% 20%; transform:skewX(0deg);}
+  }
+
+  @keyframes crazyKaleidoscope{
+    0%{transform:rotate(0deg) scale(1);}
+    25%{transform:rotate(8deg) scale(1.08);}
+    50%{transform:rotate(-6deg) scale(1.14);}
+    75%{transform:rotate(10deg) scale(1.06);}
+    100%{transform:rotate(0deg) scale(1);}
+  }
+
+  @keyframes crazyOrbitGlow{
+    0%{transform:translate3d(-3%, -2%, 0) scale(1); filter:hue-rotate(0deg);}
+    50%{transform:translate3d(4%, 3%, 0) scale(1.12); filter:hue-rotate(140deg);}
+    100%{transform:translate3d(-3%, -2%, 0) scale(1); filter:hue-rotate(0deg);}
+  }
+
+  @keyframes crazyLaserSweep{
+    0%{background-position:0% 50%; opacity:0.72;}
+    50%{background-position:100% 50%; opacity:1;}
+    100%{background-position:0% 50%; opacity:0.72;}
+  }
+
+  @keyframes crazyFlipWash{
+    0%{transform:rotate(0deg) scale(1);}
+    33%{transform:rotate(6deg) scale(1.06);}
+    66%{transform:rotate(-7deg) scale(1.11);}
+    100%{transform:rotate(0deg) scale(1);}
+  }
+
+  @keyframes crazyElementFloat{
+    0%{transform:translate3d(0, 0, 0) rotate(0deg);}
+    50%{transform:translate3d(var(--crazy-shift-x, 10px), var(--crazy-shift-y, -12px), 0) rotate(var(--crazy-tilt, 4deg));}
+    100%{transform:translate3d(0, 0, 0) rotate(0deg);}
+  }
+
+  @keyframes crazyElementWave{
+    0%{transform:translate3d(0, 0, 0) skew(0deg, 0deg);}
+    25%{transform:translate3d(calc(var(--crazy-shift-x, 10px) * -0.5), calc(var(--crazy-shift-y, -12px) * 0.35), 0) skew(calc(var(--crazy-tilt, 4deg) * -0.6), 0deg);}
+    50%{transform:translate3d(var(--crazy-shift-x, 10px), var(--crazy-shift-y, -12px), 0) skew(var(--crazy-tilt, 4deg), calc(var(--crazy-tilt, 4deg) * 0.5));}
+    75%{transform:translate3d(calc(var(--crazy-shift-x, 10px) * -0.2), calc(var(--crazy-shift-y, -12px) * -0.45), 0) skew(calc(var(--crazy-tilt, 4deg) * 0.25), calc(var(--crazy-tilt, 4deg) * -0.35));}
+    100%{transform:translate3d(0, 0, 0) skew(0deg, 0deg);}
+  }
+
+  @keyframes crazyElementPulse{
+    0%{transform:scale(1) rotate(0deg);}
+    50%{transform:scale(var(--crazy-pulse-scale, 1.12)) rotate(var(--crazy-tilt, 4deg));}
+    100%{transform:scale(1) rotate(0deg);}
+  }
+
+  @keyframes crazyElementOrbit{
+    0%{transform:translate3d(calc(var(--crazy-shift-x, 12px) * -0.55), calc(var(--crazy-shift-y, -12px) * -0.45), 0) rotate(calc(var(--crazy-tilt, 4deg) * -1));}
+    25%{transform:translate3d(var(--crazy-shift-x, 12px), calc(var(--crazy-shift-y, -12px) * -0.4), 0) rotate(calc(var(--crazy-tilt, 4deg) * 0.5));}
+    50%{transform:translate3d(calc(var(--crazy-shift-x, 12px) * 0.65), var(--crazy-shift-y, -12px), 0) rotate(var(--crazy-tilt, 4deg));}
+    75%{transform:translate3d(calc(var(--crazy-shift-x, 12px) * -0.8), calc(var(--crazy-shift-y, -12px) * 0.35), 0) rotate(calc(var(--crazy-tilt, 4deg) * -0.5));}
+    100%{transform:translate3d(calc(var(--crazy-shift-x, 12px) * -0.55), calc(var(--crazy-shift-y, -12px) * -0.45), 0) rotate(calc(var(--crazy-tilt, 4deg) * -1));}
+  }
+
+  @keyframes crazyElementSkitter{
+    0%{transform:translate3d(0, 0, 0);}
+    20%{transform:translate3d(calc(var(--crazy-shift-x, 10px) * 0.8), calc(var(--crazy-shift-y, -12px) * -0.25), 0);}
+    40%{transform:translate3d(calc(var(--crazy-shift-x, 10px) * -0.55), calc(var(--crazy-shift-y, -12px) * 0.55), 0);}
+    60%{transform:translate3d(calc(var(--crazy-shift-x, 10px) * 0.3), var(--crazy-shift-y, -12px), 0);}
+    80%{transform:translate3d(calc(var(--crazy-shift-x, 10px) * -0.75), calc(var(--crazy-shift-y, -12px) * -0.4), 0);}
+    100%{transform:translate3d(0, 0, 0);}
+  }
+
+  @keyframes crazyButtonSizeWarp{
+    0%{transform:scale(var(--crazy-scale-min, 1));}
+    50%{transform:scale(var(--crazy-scale-max, 1.2));}
+    100%{transform:scale(var(--crazy-scale-min, 1));}
+  }
+
+  @keyframes crazyRotationChaos{
+    0%{transform:rotate(calc(var(--crazy-rotate-max, 16deg) * -1));}
+    25%{transform:rotate(var(--crazy-rotate-max, 16deg));}
+    50%{transform:rotate(calc(var(--crazy-rotate-max, 16deg) * -0.7));}
+    75%{transform:rotate(calc(var(--crazy-rotate-max, 16deg) * 0.85));}
+    100%{transform:rotate(calc(var(--crazy-rotate-max, 16deg) * -1));}
+  }
+
   @media (max-width:1024px){
     #stage{padding:10px 5vw 12vh;}
     .markBtn{min-width:160px;}
@@ -785,6 +922,8 @@
   let listRevealLoaderTimer = null;
   let confettiLock = false;
   let crazyResizeTimer = null;
+  let crazyGlobalScene = null;
+  let lastCrazyBackgroundIndex = -1;
   let crazyMode = false;
 
   const CRAZY_MODE_STORAGE_KEY = "weekly50-crazy-mode";
@@ -811,7 +950,119 @@
     '"Lucida Sans Unicode", "Lucida Grande", sans-serif'
   ];
 
+  const CRAZY_BACKGROUND_TYPES = [
+    {
+      bodyBg: "linear-gradient(120deg, #ff009d 0%, #6e00ff 18%, #00eaff 40%, #fff000 64%, #ff6a00 82%, #ff009d 100%)",
+      bodySize: "300% 300%",
+      bodyAnimation: "crazyBackdrop",
+      beforeBg: "radial-gradient(circle at 18% 24%, rgba(255,0,153,0.48), transparent 24%), radial-gradient(circle at 74% 22%, rgba(0,238,255,0.36), transparent 22%), radial-gradient(circle at 28% 76%, rgba(255,242,0,0.34), transparent 24%), radial-gradient(circle at 78% 70%, rgba(124,77,255,0.34), transparent 24%)",
+      beforeSize: "130% 130%",
+      beforeAnimation: "crazyAurora",
+      afterBg: "conic-gradient(from 90deg at 50% 50%, rgba(255,0,106,0.24), rgba(0,255,247,0.16), rgba(255,230,0,0.22), rgba(124,77,255,0.18), rgba(255,0,106,0.24))",
+      afterAnimation: "crazyPrismShift"
+    },
+    {
+      bodyBg: "linear-gradient(45deg, #00ffd1 0%, #ff00bf 18%, #ffe600 42%, #3d5afe 62%, #ff5e00 82%, #00ffd1 100%)",
+      bodySize: "260% 260%",
+      bodyAnimation: "crazySpiral",
+      beforeBg: "radial-gradient(circle at 12% 18%, rgba(61,90,254,0.34), transparent 22%), radial-gradient(circle at 82% 72%, rgba(255,0,191,0.4), transparent 24%), radial-gradient(circle at 52% 54%, rgba(255,230,0,0.28), transparent 20%)",
+      beforeSize: "150% 150%",
+      beforeAnimation: "crazyOrbitGlow",
+      afterBg: "repeating-linear-gradient(135deg, rgba(255,255,255,0.08) 0 24px, rgba(0,0,0,0) 24px 48px), conic-gradient(from 180deg at 50% 50%, rgba(255,94,0,0.2), rgba(0,255,209,0.16), rgba(255,0,191,0.2), rgba(255,230,0,0.18), rgba(255,94,0,0.2))",
+      afterAnimation: "crazyLaserSweep"
+    },
+    {
+      bodyBg: "linear-gradient(160deg, #ff4d00 0%, #ff00cc 18%, #00d4ff 36%, #7cff00 54%, #ffe100 72%, #ff4d00 100%)",
+      bodySize: "340% 340%",
+      bodyAnimation: "crazyDiagonalRush",
+      beforeBg: "radial-gradient(circle at 20% 50%, rgba(255,225,0,0.3), transparent 20%), radial-gradient(circle at 50% 20%, rgba(0,212,255,0.34), transparent 24%), radial-gradient(circle at 80% 64%, rgba(255,0,204,0.34), transparent 24%)",
+      beforeSize: "170% 170%",
+      beforeAnimation: "crazyRippleField",
+      afterBg: "conic-gradient(from 0deg at 20% 50%, rgba(124,255,0,0.18), rgba(255,0,204,0.18), rgba(0,212,255,0.18), rgba(255,225,0,0.18), rgba(124,255,0,0.18))",
+      afterAnimation: "crazyKaleidoscope"
+    },
+    {
+      bodyBg: "radial-gradient(circle at 20% 20%, #ff1a75 0%, transparent 28%), radial-gradient(circle at 80% 30%, #00f7ff 0%, transparent 26%), radial-gradient(circle at 50% 80%, #d5ff00 0%, transparent 28%), linear-gradient(135deg, #4b0082 0%, #ff8c00 100%)",
+      bodySize: "180% 180%",
+      bodyAnimation: "crazyTunnelZoom",
+      beforeBg: "repeating-radial-gradient(circle at 50% 50%, rgba(255,255,255,0.1) 0 14px, rgba(0,0,0,0) 14px 38px)",
+      beforeSize: "200% 200%",
+      beforeAnimation: "crazyFlipWash",
+      afterBg: "linear-gradient(90deg, rgba(255,26,117,0.18), rgba(0,247,255,0.18), rgba(213,255,0,0.18), rgba(255,140,0,0.18))",
+      afterAnimation: "crazyWaveBands"
+    },
+    {
+      bodyBg: "linear-gradient(90deg, #00a6ff 0%, #ff00f2 24%, #00ff88 48%, #fff200 72%, #00a6ff 100%)",
+      bodySize: "420% 180%",
+      bodyAnimation: "crazyWaveBands",
+      beforeBg: "radial-gradient(circle at 24% 40%, rgba(0,166,255,0.3), transparent 24%), radial-gradient(circle at 70% 52%, rgba(255,0,242,0.32), transparent 22%), radial-gradient(circle at 48% 78%, rgba(0,255,136,0.26), transparent 20%)",
+      beforeSize: "160% 140%",
+      beforeAnimation: "crazyDiagonalRush",
+      afterBg: "repeating-linear-gradient(0deg, rgba(255,242,0,0.18) 0 18px, rgba(0,0,0,0) 18px 36px), linear-gradient(180deg, rgba(255,0,242,0.16), rgba(0,166,255,0.18))",
+      afterAnimation: "crazyPrismShift"
+    },
+    {
+      bodyBg: "conic-gradient(from 180deg at 50% 50%, #ff006e, #8338ec, #3a86ff, #06d6a0, #ffbe0b, #ff006e)",
+      bodySize: "220% 220%",
+      bodyAnimation: "crazyKaleidoscope",
+      beforeBg: "radial-gradient(circle at 50% 50%, rgba(255,255,255,0.1) 0%, transparent 36%), radial-gradient(circle at 22% 70%, rgba(255,190,11,0.25), transparent 22%), radial-gradient(circle at 78% 28%, rgba(58,134,255,0.28), transparent 24%)",
+      beforeSize: "175% 175%",
+      beforeAnimation: "crazySpiral",
+      afterBg: "linear-gradient(120deg, rgba(255,0,110,0.18), rgba(6,214,160,0.14), rgba(131,56,236,0.2), rgba(255,190,11,0.16))",
+      afterAnimation: "crazyOrbitGlow"
+    },
+    {
+      bodyBg: "linear-gradient(200deg, #39ff14 0%, #ff2079 22%, #00e5ff 46%, #ffea00 68%, #9d4edd 100%)",
+      bodySize: "260% 260%",
+      bodyAnimation: "crazyFlipWash",
+      beforeBg: "repeating-linear-gradient(45deg, rgba(255,255,255,0.08) 0 16px, rgba(0,0,0,0) 16px 34px), radial-gradient(circle at 75% 25%, rgba(255,32,121,0.28), transparent 22%)",
+      beforeSize: "150% 150%",
+      beforeAnimation: "crazyLaserSweep",
+      afterBg: "conic-gradient(from 270deg at 50% 50%, rgba(57,255,20,0.18), rgba(0,229,255,0.16), rgba(157,78,221,0.18), rgba(255,234,0,0.16), rgba(57,255,20,0.18))",
+      afterAnimation: "crazyRippleField"
+    },
+    {
+      bodyBg: "radial-gradient(circle at 15% 25%, #ff9f1c 0%, transparent 26%), radial-gradient(circle at 82% 18%, #2ec4b6 0%, transparent 24%), radial-gradient(circle at 72% 82%, #e71d36 0%, transparent 25%), linear-gradient(140deg, #011627 0%, #8338ec 100%)",
+      bodySize: "200% 200%",
+      bodyAnimation: "crazyOrbitGlow",
+      beforeBg: "radial-gradient(circle at 50% 50%, rgba(255,255,255,0.1) 0 20%, transparent 45%), repeating-radial-gradient(circle at 50% 50%, rgba(46,196,182,0.18) 0 14px, rgba(0,0,0,0) 14px 42px)",
+      beforeSize: "210% 210%",
+      beforeAnimation: "crazyTunnelZoom",
+      afterBg: "linear-gradient(90deg, rgba(231,29,54,0.18), rgba(255,159,28,0.18), rgba(46,196,182,0.18), rgba(131,56,236,0.18))",
+      afterAnimation: "crazyDiagonalRush"
+    },
+    {
+      bodyBg: "linear-gradient(135deg, #f72585 0%, #7209b7 20%, #3a0ca3 40%, #4361ee 60%, #4cc9f0 80%, #f72585 100%)",
+      bodySize: "360% 360%",
+      bodyAnimation: "crazyPrismShift",
+      beforeBg: "radial-gradient(circle at 20% 75%, rgba(247,37,133,0.36), transparent 24%), radial-gradient(circle at 80% 24%, rgba(76,201,240,0.32), transparent 24%), radial-gradient(circle at 45% 45%, rgba(114,9,183,0.24), transparent 26%)",
+      beforeSize: "145% 145%",
+      beforeAnimation: "crazyWaveBands",
+      afterBg: "repeating-linear-gradient(90deg, rgba(255,255,255,0.06) 0 10px, rgba(0,0,0,0) 10px 26px), conic-gradient(from 45deg at 50% 50%, rgba(67,97,238,0.18), rgba(247,37,133,0.18), rgba(76,201,240,0.18), rgba(67,97,238,0.18))",
+      afterAnimation: "crazySpiral"
+    },
+    {
+      bodyBg: "linear-gradient(110deg, #00ffcc 0%, #ff477e 18%, #ffd60a 36%, #7b2cbf 54%, #00bbf9 72%, #00ffcc 100%)",
+      bodySize: "280% 280%",
+      bodyAnimation: "crazyLaserSweep",
+      beforeBg: "radial-gradient(circle at 30% 24%, rgba(0,255,204,0.3), transparent 22%), radial-gradient(circle at 68% 62%, rgba(255,71,126,0.34), transparent 24%), radial-gradient(circle at 82% 22%, rgba(255,214,10,0.28), transparent 22%)",
+      beforeSize: "165% 165%",
+      beforeAnimation: "crazyFlipWash",
+      afterBg: "conic-gradient(from 135deg at 60% 40%, rgba(0,187,249,0.18), rgba(123,44,191,0.18), rgba(255,214,10,0.18), rgba(255,71,126,0.18), rgba(0,187,249,0.18))",
+      afterAnimation: "crazyTunnelZoom"
+    }
+  ];
+
+  const CRAZY_ELEMENT_ANIMATIONS = [
+    "crazyElementFloat",
+    "crazyElementWave",
+    "crazyElementPulse",
+    "crazyElementOrbit",
+    "crazyElementSkitter"
+  ];
+
   const stage = document.getElementById("stage");
+  const progressTrack = document.getElementById("progressTrack");
   const progressFill = document.getElementById("progressFill");
   const scoreboard = document.getElementById("scoreboard");
   const scoreVal = document.getElementById("scoreVal");
@@ -987,7 +1238,9 @@
   function buildSlides(parsed, label){
     sourceLabel = label;
     slides = [];
-    slides.push({ type: "title", title: parsed.title, notes: parsed.notes });
+    crazyGlobalScene = null;
+    lastCrazyBackgroundIndex = -1;
+    slides.push({ type: "title", title: parsed.title, notes: parsed.notes, crazyScene: null });
     parsed.questions.forEach(q => {
       slides.push({
         type: "question",
@@ -997,10 +1250,11 @@
         revealed: false,
         listRevealPending: false,
         mark: null,
-        crazyButtonLayout: null
+        crazyButtonLayout: null,
+        crazyScene: null
       });
     });
-    slides.push({ type: "final" });
+    slides.push({ type: "final", crazyScene: null });
     current = 0;
     maxVisitedQuestionIndex = 0;
   }
@@ -1196,7 +1450,7 @@
         '<div class="spinner"></div>' +
         '<div class="statusLine"><span class="dot"></span> Fetching this week\'s fifty...</div>' +
       '</div>';
-    refreshCrazyPresentation({ rerandomizeFonts: true, fontRoots: [stage] });
+    refreshCrazyPresentation({ rerandomizeFonts: true, rerandomizeMotion: true, fontRoots: [stage, scoreboard, progressTrack, crazyToggle], motionRoots: [stage, scoreboard, progressTrack, crazyToggle] });
   }
 
   function renderLoadError(err){
@@ -1265,7 +1519,7 @@
       }
     });
 
-    refreshCrazyPresentation({ rerandomizeFonts: true, fontRoots: [stage] });
+    refreshCrazyPresentation({ rerandomizeFonts: true, rerandomizeMotion: true, fontRoots: [stage, scoreboard, progressTrack, crazyToggle], motionRoots: [stage, scoreboard, progressTrack, crazyToggle] });
   }
 
   function escapeHTML(str){
@@ -1286,6 +1540,72 @@
 
   function randomCrazyControlFont(){
     return CRAZY_CONTROL_FONTS[Math.floor(Math.random() * CRAZY_CONTROL_FONTS.length)];
+  }
+
+  function randomBetween(min, max){
+    return min + Math.random() * (max - min);
+  }
+
+  function randomItem(items){
+    return items[Math.floor(Math.random() * items.length)];
+  }
+
+  function chance(probability){
+    return Math.random() < probability;
+  }
+
+  function prefersReducedMotion(){
+    return !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  }
+
+  function createCrazyScene(slide){
+    let backgroundIndex = Math.floor(Math.random() * CRAZY_BACKGROUND_TYPES.length);
+    if (slide && slide.type === "question" && CRAZY_BACKGROUND_TYPES.length > 1 && backgroundIndex === lastCrazyBackgroundIndex) {
+      backgroundIndex = (backgroundIndex + 1 + Math.floor(Math.random() * (CRAZY_BACKGROUND_TYPES.length - 1))) % CRAZY_BACKGROUND_TYPES.length;
+    }
+    if (slide && slide.type === "question") lastCrazyBackgroundIndex = backgroundIndex;
+    const background = CRAZY_BACKGROUND_TYPES[backgroundIndex];
+    const speedMultiplier = randomBetween(0.5, 5);
+    return {
+      id: (slide && slide.type ? slide.type : "global") + "-" + Math.random().toString(36).slice(2, 9),
+      backgroundIndex: backgroundIndex,
+      background: background,
+      speedMultiplier: speedMultiplier,
+      bodyDirection: randomItem(["normal", "reverse", "alternate"]),
+      beforeDirection: randomItem(["normal", "reverse", "alternate", "alternate-reverse"]),
+      afterDirection: randomItem(["normal", "reverse", "alternate", "alternate-reverse"])
+    };
+  }
+
+  function getCrazyScene(slide){
+    if (slide && slide.type === "question") {
+      if (!slide.crazyScene) slide.crazyScene = createCrazyScene(slide);
+      return slide.crazyScene;
+    }
+    if (slide && slide.crazyScene) return slide.crazyScene;
+    if (!crazyGlobalScene) crazyGlobalScene = createCrazyScene(slide || { type: "global" });
+    if (slide) slide.crazyScene = crazyGlobalScene;
+    return crazyGlobalScene;
+  }
+
+  function applyCrazyBackgroundScene(scene){
+    if (!scene) return;
+    const background = scene.background;
+    document.body.style.setProperty("--crazy-body-bg", background.bodyBg);
+    document.body.style.setProperty("--crazy-body-size", background.bodySize || "300% 300%");
+    document.body.style.setProperty("--crazy-body-animation", background.bodyAnimation);
+    document.body.style.setProperty("--crazy-body-duration", (14 / scene.speedMultiplier).toFixed(2) + "s");
+    document.body.style.setProperty("--crazy-body-direction", scene.bodyDirection);
+    document.body.style.setProperty("--crazy-before-bg", background.beforeBg);
+    document.body.style.setProperty("--crazy-before-size", background.beforeSize || "140% 140%");
+    document.body.style.setProperty("--crazy-before-animation", background.beforeAnimation);
+    document.body.style.setProperty("--crazy-before-duration", (11 / scene.speedMultiplier).toFixed(2) + "s");
+    document.body.style.setProperty("--crazy-before-direction", scene.beforeDirection);
+    document.body.style.setProperty("--crazy-after-bg", background.afterBg);
+    document.body.style.setProperty("--crazy-after-size", background.afterSize || "120% 120%");
+    document.body.style.setProperty("--crazy-after-animation", background.afterAnimation);
+    document.body.style.setProperty("--crazy-after-duration", (18 / scene.speedMultiplier).toFixed(2) + "s");
+    document.body.style.setProperty("--crazy-after-direction", scene.afterDirection);
   }
 
   function setFontOnSelector(root, selector, font){
@@ -1338,6 +1658,122 @@
       el.removeAttribute("data-crazy-font");
     });
     if (!scope) document.body.style.fontFamily = "";
+  }
+
+  function clearCrazyMotion(scope){
+    const root = scope || document;
+    const clearEl = (el) => {
+      el.style.animation = "";
+      el.style.removeProperty("--crazy-shift-x");
+      el.style.removeProperty("--crazy-shift-y");
+      el.style.removeProperty("--crazy-tilt");
+      el.style.removeProperty("--crazy-pulse-scale");
+      el.style.removeProperty("--crazy-scale-min");
+      el.style.removeProperty("--crazy-scale-max");
+      el.style.removeProperty("--crazy-rotate-max");
+      el.style.removeProperty("--crazy-origin-x");
+      el.style.removeProperty("--crazy-origin-y");
+      el.style.removeProperty("--crazy-hue");
+      el.style.removeProperty("--crazy-saturate");
+      el.removeAttribute("data-crazy-motion");
+    };
+
+    if (root !== document && root.getAttribute && root.getAttribute("data-crazy-motion")) clearEl(root);
+    root.querySelectorAll("[data-crazy-motion]").forEach(clearEl);
+  }
+
+  function buildCrazyAnimationString(el, role, scene){
+    const animations = [];
+    const speed = scene ? scene.speedMultiplier : 1;
+    const baseDuration = (randomBetween(2.8, 9.4) / Math.max(speed, 0.35)).toFixed(2);
+    const baseDelay = (-randomBetween(0, Number(baseDuration))).toFixed(2);
+    const baseDirection = randomItem(["normal", "reverse", "alternate", "alternate-reverse"]);
+
+    el.style.setProperty("--crazy-shift-x", randomBetween(-28, 28).toFixed(2) + "px");
+    el.style.setProperty("--crazy-shift-y", randomBetween(-24, 24).toFixed(2) + "px");
+    el.style.setProperty("--crazy-tilt", randomBetween(-12, 12).toFixed(2) + "deg");
+    el.style.setProperty("--crazy-pulse-scale", randomBetween(1.02, 1.32).toFixed(2));
+    el.style.setProperty("--crazy-origin-x", randomBetween(10, 90).toFixed(2) + "%");
+    el.style.setProperty("--crazy-origin-y", randomBetween(10, 90).toFixed(2) + "%");
+    el.style.setProperty("--crazy-hue", randomBetween(-90, 90).toFixed(2) + "deg");
+    el.style.setProperty("--crazy-saturate", randomBetween(1, 1.9).toFixed(2));
+
+    animations.push([
+      randomItem(CRAZY_ELEMENT_ANIMATIONS),
+      baseDuration + "s",
+      randomItem(["ease-in-out", "linear", "cubic-bezier(.38,.06,.54,.98)"]),
+      baseDelay + "s",
+      "infinite",
+      baseDirection
+    ].join(" "));
+
+    if (role === "button") {
+      animations.unshift([
+        "crazyControls",
+        (5 / Math.max(speed, 0.35)).toFixed(2) + "s",
+        "linear",
+        (-randomBetween(0, 5)).toFixed(2) + "s",
+        "infinite",
+        randomItem(["normal", "reverse"])
+      ].join(" "));
+
+      if (chance(0.1)) {
+        const minScale = randomBetween(0.01, 1.15);
+        const maxScale = randomBetween(Math.max(1.05, minScale + 0.12), 5);
+        el.style.setProperty("--crazy-scale-min", minScale.toFixed(2));
+        el.style.setProperty("--crazy-scale-max", maxScale.toFixed(2));
+        animations.push([
+          "crazyButtonSizeWarp",
+          (randomBetween(0.8, 3.8) / Math.max(speed, 0.35)).toFixed(2) + "s",
+          "ease-in-out",
+          (-randomBetween(0, 2)).toFixed(2) + "s",
+          "infinite",
+          randomItem(["alternate", "alternate-reverse"])
+        ].join(" "));
+      }
+    }
+
+    if ((role === "question" || role === "answer" || role === "button") && chance(0.05)) {
+      el.style.setProperty("--crazy-rotate-max", randomBetween(6, 38).toFixed(2) + "deg");
+      animations.push([
+        "crazyRotationChaos",
+        (randomBetween(0.7, 4.6) / Math.max(speed, 0.35)).toFixed(2) + "s",
+        "linear",
+        (-randomBetween(0, 2.5)).toFixed(2) + "s",
+        "infinite",
+        randomItem(["alternate", "alternate-reverse", "normal", "reverse"])
+      ].join(" "));
+    }
+
+    return animations.join(", ");
+  }
+
+  function applyCrazyMotionToRoots(roots, scene){
+    if (prefersReducedMotion()) return;
+
+    const selectors = [
+      { selector: ".wordmark, .subtitle, .qNumber, .finalScore, .finalVerdict", role: "headline" },
+      { selector: ".qText, .qText *", role: "question" },
+      { selector: ".answerLabel, .answerText, .answerText *", role: "answer" },
+      { selector: ".bigBtn, .ghostBtn, .revealBtn, .smallBtn, .markBtn, .miniBtn, #crazyToggle", role: "button" },
+      { selector: "#scoreboard, #progressTrack, #progressFill, .panel, .statusLine", role: "interface" }
+    ];
+
+    roots.forEach(root => {
+      clearCrazyMotion(root);
+      selectors.forEach(group => {
+        if (root.matches && root.matches(group.selector)) {
+          root.style.animation = buildCrazyAnimationString(root, group.role, scene);
+          root.setAttribute("data-crazy-motion", "true");
+        }
+        if (!root.querySelectorAll) return;
+        root.querySelectorAll(group.selector).forEach(el => {
+          if (el.tagName === "SCRIPT" || el.tagName === "STYLE") return;
+          el.style.animation = buildCrazyAnimationString(el, group.role, scene);
+          el.setAttribute("data-crazy-motion", "true");
+        });
+      });
+    });
   }
 
   function clearCrazyButtonLayout(){
@@ -1422,13 +1858,16 @@
 
     const positions = buttons.map(btn => {
       const rect = btn.getBoundingClientRect();
+      const baseWidth = Math.max(Math.ceil(rect.width), 156);
+      const baseHeight = Math.max(Math.ceil(rect.height), 52);
+      const maxScale = Math.max(1, parseFloat(btn.style.getPropertyValue("--crazy-scale-max") || "1"));
       const size = {
-        width: Math.max(Math.ceil(rect.width), 156),
-        height: Math.max(Math.ceil(rect.height), 52)
+        width: Math.max(Math.ceil(baseWidth * maxScale), 156),
+        height: Math.max(Math.ceil(baseHeight * maxScale), 52)
       };
       const spot = chooseCrazyButtonSpot(size, reservedRects, placedRects);
       placedRects.push(spot.rect);
-      return { left: spot.left, top: spot.top, width: size.width };
+      return { left: spot.left, top: spot.top, width: baseWidth };
     });
     positions.sort((a, b) => a.top - b.top || a.left - b.left);
     return positions;
@@ -1474,22 +1913,28 @@
 
   function refreshCrazyPresentation(options){
     const settings = options || {};
-    const prefersReduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const motionRoots = settings.motionRoots || settings.fontRoots || [stage, scoreboard, progressTrack, crazyToggle];
     document.body.classList.toggle("crazy-mode", crazyMode);
     syncCrazyToggle();
 
     if (!crazyMode) {
       clearCrazyFonts();
+      clearCrazyMotion();
       clearCrazyButtonLayout();
       return;
     }
 
+    applyCrazyBackgroundScene(getCrazyScene(slides[current]));
+
     if (settings.rerandomizeFonts) {
       const fontRoots = settings.fontRoots || [document.body];
-      const rootsToRandomize = prefersReduced
-        ? fontRoots.filter(root => root === document.body || !(root.querySelector && root.querySelector("[data-crazy-font]")))
-        : fontRoots;
-      if (rootsToRandomize.length) randomizeFontsInRoots(rootsToRandomize);
+      if (fontRoots.length) randomizeFontsInRoots(fontRoots);
+    }
+    if (settings.rerandomizeMotion) {
+      applyCrazyMotionToRoots(motionRoots, getCrazyScene(slides[current]));
+      if (slides[current] && slides[current].type === "question") {
+        slides[current].crazyButtonLayout = null;
+      }
     }
     const slide = slides[current];
     if (slide && slide.type === "question" && slide.revealed) {
@@ -1507,8 +1952,8 @@
     if (slides.length && slides[current] && slides[current].type === "question") {
       slides[current].crazyButtonLayout = null;
     }
-    const roots = slides.length ? [stage, scoreboard, progressFill.parentElement, crazyToggle] : [document.body];
-    refreshCrazyPresentation({ rerandomizeFonts: crazyMode, fontRoots: roots });
+    const roots = slides.length ? [stage, scoreboard, progressTrack, crazyToggle] : [document.body];
+    refreshCrazyPresentation({ rerandomizeFonts: crazyMode, rerandomizeMotion: crazyMode, fontRoots: roots, motionRoots: roots });
   }
 
   function totalQuestions(){
@@ -1555,7 +2000,7 @@
         '</div>';
 
       document.getElementById("startBtn").addEventListener("click", () => goTo(current + 1));
-      refreshCrazyPresentation({ rerandomizeFonts: true, fontRoots: [stage] });
+      refreshCrazyPresentation({ rerandomizeFonts: true, rerandomizeMotion: true, fontRoots: [stage, scoreboard, progressTrack, crazyToggle], motionRoots: [stage, scoreboard, progressTrack, crazyToggle] });
       return;
     }
 
@@ -1606,7 +2051,7 @@
       });
 
       setupListReveal(slide);
-      refreshCrazyPresentation({ rerandomizeFonts: true, fontRoots: [stage] });
+      refreshCrazyPresentation({ rerandomizeFonts: true, rerandomizeMotion: true, fontRoots: [stage, scoreboard, progressTrack, crazyToggle], motionRoots: [stage, scoreboard, progressTrack, crazyToggle] });
       return;
     }
 
@@ -1640,12 +2085,15 @@
             s.confettiTriggered = false;
             s.listRevealPending = false;
             s.crazyButtonLayout = null;
+            s.crazyScene = null;
           }
         });
+        crazyGlobalScene = null;
+        lastCrazyBackgroundIndex = -1;
         clearAutoAdvance();
         goTo(0);
       });
-      refreshCrazyPresentation({ rerandomizeFonts: true, fontRoots: [stage] });
+      refreshCrazyPresentation({ rerandomizeFonts: true, rerandomizeMotion: true, fontRoots: [stage, scoreboard, progressTrack, crazyToggle], motionRoots: [stage, scoreboard, progressTrack, crazyToggle] });
     }
   }
 
