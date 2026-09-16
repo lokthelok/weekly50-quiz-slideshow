@@ -414,6 +414,37 @@
     top:12px;
     left:12px;
     z-index:40;
+    min-width:0;
+    height:auto;
+    padding:0;
+    border:none;
+    border-radius:0;
+    background:transparent;
+    color:var(--text);
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:0.08em;
+    text-transform:lowercase;
+    line-height:1;
+    backdrop-filter:none;
+    opacity:1;
+    transition:opacity 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
+  }
+
+  .crazyToggle:not([aria-pressed="true"]){
+    background:transparent;
+    border:none;
+    box-shadow:none;
+    color:rgba(251, 226, 223, 0.68);
+    cursor:pointer;
+  }
+
+  .crazyToggle:not([aria-pressed="true"]):hover{
+    opacity:0.9;
+    transform:none;
+  }
+
+  .crazyToggle[aria-pressed="true"]{
     min-width:44px;
     height:44px;
     padding:0 10px;
@@ -425,13 +456,12 @@
     font-weight:700;
     letter-spacing:0.14em;
     text-transform:uppercase;
-    line-height:1;
     backdrop-filter:blur(10px);
     opacity:0.3;
-    transition:opacity 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    box-shadow:none;
   }
 
-  .crazyToggle:hover,
+  .crazyToggle[aria-pressed="true"]:hover,
   .crazyToggle[aria-pressed="true"]{
     opacity:0.95;
     transform:scale(1.08);
@@ -589,8 +619,8 @@
     align-items:center;
     justify-content:center;
     padding:24px;
-    background:rgba(10, 0, 16, 0.6);
-    backdrop-filter:blur(10px);
+    background:rgba(7, 13, 22, 0.62);
+    backdrop-filter:blur(8px);
   }
 
   .crazyDisclaimer[hidden]{
@@ -601,24 +631,35 @@
     width:min(100%, 520px);
     padding:24px 24px 20px;
     border-radius:20px;
-    border:1px solid rgba(255,255,255,0.48);
-    background:linear-gradient(135deg, rgba(255,0,149,0.88), rgba(37,0,89,0.92), rgba(0,234,255,0.72));
-    box-shadow:0 26px 70px rgba(0,0,0,0.45);
-    color:#fff;
+    border:1px solid var(--line);
+    background:rgba(0,7,22,0.88);
+    box-shadow:0 18px 50px rgba(0,0,0,0.28);
+    color:var(--text);
     text-align:left;
   }
 
   .crazyDisclaimerTitle{
-    margin:0 0 10px;
+    margin:0 0 8px;
     font-size:clamp(22px, 4vw, 30px);
     text-transform:uppercase;
     letter-spacing:0.08em;
+    color:var(--text);
+  }
+
+  .crazyDisclaimerSubtitle{
+    margin:0 0 12px;
+    font-size:14px;
+    line-height:1.4;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--muted);
   }
 
   .crazyDisclaimerText{
     margin:0;
     font-size:15px;
     line-height:1.6;
+    color:var(--text);
   }
 
   .crazyDisclaimerActions{
@@ -668,6 +709,347 @@
     22%{opacity:1;}
     82%{opacity:1;}
     100%{transform:translate(var(--piece-x, 0px), var(--piece-y, -760px)) rotate(var(--piece-rotate, 1440deg)) scale(0.7); opacity:0;}
+  }
+
+  .celebrationLayer{
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    z-index:35;
+    overflow:hidden;
+    isolation:isolate;
+  }
+
+  .celebrationBarrage,
+  .celebrationFinal{
+    background:transparent;
+  }
+
+  .celebrationStage{
+    position:relative;
+    width:100%;
+    height:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+  }
+
+  .celebrationGhost{
+    position:absolute;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:rgba(255,255,255,0.9);
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    font-size:clamp(18px, 3vw, 30px);
+    font-weight:700;
+    opacity:0.9;
+    text-shadow:0 0 25px rgba(255,255,255,0.4), 0 0 60px rgba(255,0,149,0.32);
+  }
+
+  .barrageBurst,
+  .barrageCore,
+  .barrageRings,
+  .barrageStreak,
+  .barrageSpark,
+  .portalRing,
+  .portalHalo,
+  .prismBeam,
+  .prismFlash,
+  .finalHalo,
+  .finalShockwave,
+  .finalOrbit,
+  .finalSpark{
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+  }
+
+  .barrageCore{
+    left:50%;
+    top:50%;
+    width:min(28vmin, 290px);
+    height:min(28vmin, 290px);
+    transform:translate(-50%, -50%) scale(0.3);
+    border-radius:50%;
+    background:radial-gradient(circle, rgba(255,255,255,0.96) 0%, rgba(255,0,149,0.9) 16%, rgba(0,234,255,0.7) 32%, rgba(255,230,0,0.4) 48%, transparent 72%);
+    filter:blur(10px);
+    opacity:0;
+    animation:barrageCore 4.2s ease-out forwards;
+  }
+
+  .barrageRings{
+    inset:-10%;
+    border-radius:50%;
+    background:radial-gradient(circle, rgba(255,255,255,0.14), rgba(255,0,149,0.12) 18%, rgba(0,234,255,0.12) 32%, transparent 58%);
+    opacity:0;
+    animation:barrageRings 7.8s ease-out infinite alternate;
+  }
+
+  .barrageStreak{
+    left:50%;
+    top:50%;
+    width:40vw;
+    height:16vh;
+    transform:translate(-50%, -50%) rotate(-18deg) scaleX(0.18);
+    background:linear-gradient(90deg, transparent, rgba(255,255,255,0.9) 16%, rgba(255,0,149,0.92) 36%, rgba(0,234,255,0.82) 55%, rgba(255,230,0,0.8) 72%, transparent 100%);
+    filter:blur(4px);
+    opacity:0;
+    animation:barrageStreak 5s cubic-bezier(.2,.8,.3,1) infinite;
+  }
+
+  .barrageStreak.s2{transform:translate(-50%, -50%) rotate(18deg) scaleX(0.22); animation-delay:0.7s;}
+  .barrageStreak.s3{transform:translate(-50%, -50%) rotate(-6deg) scaleX(0.24); animation-delay:1.5s;}
+
+  .barrageBurst{
+    inset:-15%;
+    background:radial-gradient(circle at center, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.17) 18%, rgba(0,234,255,0.18) 36%, transparent 64%);
+    opacity:0;
+    animation:barrageBurst 9s ease-out forwards;
+  }
+
+  .barrageSpark{
+    width:12px;
+    height:12px;
+    left:50%;
+    top:50%;
+    border-radius:50%;
+    background:var(--spark-color, rgba(255,255,255,0.85));
+    box-shadow:0 0 15px rgba(255,255,255,0.7), 0 0 26px var(--spark-glow, rgba(0,234,255,0.52)), 0 0 52px var(--spark-glow, rgba(255,0,149,0.5));
+    opacity:0;
+    animation:barrageSpark 3.4s cubic-bezier(.15,.8,.25,1) infinite;
+  }
+
+  .barrageSpark.s2{animation-delay:0.5s;}
+  .barrageSpark.s3{animation-delay:1.3s;}
+  .barrageSpark.s4{animation-delay:2.1s;}
+  .barrageSpark.s5{animation-delay:2.9s;}
+
+  .portalRing{
+    left:50%;
+    top:50%;
+    width:min(55vmin, 560px);
+    height:min(55vmin, 560px);
+    transform:translate(-50%, -50%) scale(0.3);
+    border-radius:50%;
+    border:3px solid rgba(255,255,255,0.9);
+    box-shadow:0 0 35px rgba(200,255,255,0.5), 0 0 120px rgba(255,0,149,0.36), inset 0 0 28px rgba(255,255,255,0.24);
+    opacity:0;
+    animation:portalRing 9s ease-out forwards;
+  }
+
+  .portalHalo{
+    left:50%;
+    top:50%;
+    width:min(72vmin, 720px);
+    height:min(72vmin, 720px);
+    transform:translate(-50%, -50%) scale(0.4);
+    border-radius:50%;
+    background:radial-gradient(circle, rgba(255,255,255,0.42) 0%, rgba(0,234,255,0.2) 22%, rgba(255,0,149,0.16) 39%, rgba(124,77,255,0.12) 58%, transparent 75%);
+    opacity:0;
+    filter:blur(10px);
+    animation:portalHalo 8s ease-out forwards;
+  }
+
+  .prismBeam{
+    left:50%;
+    top:50%;
+    width:110vw;
+    height:26vh;
+    opacity:0;
+    transform:translate(-50%, -50%) rotate(-18deg) scaleX(0.2);
+    background:linear-gradient(90deg, transparent, rgba(255,255,255,0.9) 17%, rgba(255,0,149,0.92) 35%, rgba(0,234,255,0.9) 52%, rgba(255,230,0,0.88) 70%, transparent 100%);
+    filter:blur(4px);
+    animation:prismBeam 7.8s cubic-bezier(.25,.8,.25,1) forwards;
+  }
+
+  .prismBeam.beam2{animation-delay:0.9s; transform:translate(-50%, -50%) rotate(18deg) scaleX(0.18);}
+  .prismBeam.beam3{animation-delay:1.8s; transform:translate(-50%, -50%) rotate(-6deg) scaleX(0.24);}
+
+  .prismFlash{
+    inset:-10%;
+    background:radial-gradient(circle at center, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.34) 18%, rgba(255,0,149,0.28) 35%, rgba(0,234,255,0.18) 48%, transparent 70%);
+    opacity:0;
+    animation:prismFlash 6s ease-out forwards;
+  }
+
+  .finalHalo{
+    inset:-14%;
+    background:radial-gradient(circle at center, rgba(255,255,255,0.15), rgba(255,0,149,0.12) 18%, rgba(0,234,255,0.12) 34%, rgba(255,230,0,0.12) 52%, transparent 72%);
+    filter:blur(18px);
+    opacity:0;
+    animation:finalHalo 10s ease-in-out infinite alternate;
+  }
+
+  .finalShockwave,
+  .finalOrbit,
+  .finalSpark{
+    border-radius:50%;
+    opacity:0;
+  }
+
+  .finalShockwave{
+    inset:8%;
+    border:2px solid rgba(255,255,255,0.7);
+    box-shadow:0 0 30px rgba(255,255,255,0.3), 0 0 80px rgba(0,234,255,0.26);
+    animation:finalShockwave 12s ease-out infinite;
+  }
+
+  .finalOrbit{
+    inset:-18%;
+    border:1px solid rgba(255,255,255,0.24);
+    box-shadow:inset 0 0 30px rgba(255,255,255,0.12);
+    animation:finalOrbit 16s linear infinite;
+  }
+
+  .finalSpark{
+    width:8px;
+    height:8px;
+    background:var(--spark-color, rgba(255,255,255,0.9));
+    box-shadow:0 0 12px rgba(255,255,255,0.8), 0 0 28px var(--spark-glow, rgba(255,0,149,0.62)), 0 0 52px var(--spark-glow, rgba(0,234,255,0.54));
+    animation:finalSpark 3s ease-in-out infinite;
+  }
+
+  @keyframes barrageCore{
+    0%{opacity:0; transform:translate(-50%, -50%) scale(0.2);} 
+    20%{opacity:1; transform:translate(-50%, -50%) scale(0.82);} 
+    45%{opacity:1; transform:translate(-50%, -50%) scale(1.18);} 
+    72%{opacity:0.7; transform:translate(-50%, -50%) scale(1.46);} 
+    100%{opacity:0; transform:translate(-50%, -50%) scale(1.9);} 
+  }
+
+  @keyframes barrageRings{
+    0%{opacity:0; transform:scale(0.78);} 
+    20%{opacity:0.8; transform:scale(1.1);} 
+    60%{opacity:0.5; transform:scale(1.34);} 
+    100%{opacity:0; transform:scale(1.7);} 
+  }
+
+  @keyframes barrageBurst{
+    0%{opacity:0; transform:scale(0.5);} 
+    18%{opacity:0.9; transform:scale(1);} 
+    60%{opacity:0.7; transform:scale(1.18);} 
+    100%{opacity:0; transform:scale(1.5);} 
+  }
+
+  @keyframes barrageStreak{
+    0%{opacity:0; transform:translate(-50%, -50%) rotate(var(--barrage-rot, -18deg)) scaleX(0.18);} 
+    16%{opacity:0.9;} 
+    45%{opacity:1; transform:translate(-50%, -50%) rotate(var(--barrage-rot, -18deg)) scaleX(1.25);} 
+    75%{opacity:0.7; transform:translate(-50%, -50%) rotate(var(--barrage-rot, -18deg)) scaleX(1.65);} 
+    100%{opacity:0; transform:translate(-50%, -50%) rotate(var(--barrage-rot, -18deg)) scaleX(2.2);} 
+  }
+
+  @keyframes barrageSpark{
+    0%{opacity:0; transform:translate(-50%, -50%) scale(0.3);} 
+    18%{opacity:1; transform:translate(-50%, -50%) scale(1);} 
+    42%{opacity:0.9; transform:translate(var(--spark-x, 0px), var(--spark-y, 0px)) scale(1.12);} 
+    100%{opacity:0; transform:translate(var(--spark-x, 0px), var(--spark-y, 0px)) scale(0.4);} 
+  }
+
+  @keyframes barrageRing{
+    0%{opacity:0; transform:scale(0.1);}
+    8%{opacity:1;}
+    25%{opacity:1; transform:scale(1.06);}
+    60%{opacity:0.8; transform:scale(1.3);}
+    100%{opacity:0; transform:scale(1.9);}
+  }
+
+  @keyframes barrageWave{
+    0%{opacity:0; transform:scale(0.6);} 
+    22%{opacity:0.8; transform:scale(1.04);} 
+    55%{opacity:0.5; transform:scale(1.18);} 
+    100%{opacity:0; transform:scale(1.5);} 
+  }
+
+  @keyframes barrageBeam{
+    0%{opacity:0; transform:translateX(-50%) rotate(18deg) scaleY(0.25);}
+    16%{opacity:1;}
+    42%{opacity:1; transform:translateX(-50%) rotate(18deg) scaleY(1.12);}
+    72%{opacity:0.7; transform:translateX(-50%) rotate(18deg) scaleY(1.45);}
+    100%{opacity:0; transform:translateX(-50%) rotate(18deg) scaleY(1.8);}
+  }
+
+  @keyframes portalRing{
+    0%{opacity:0; transform:translate(-50%, -50%) scale(0.2);}
+    18%{opacity:1; transform:translate(-50%, -50%) scale(0.72);}
+    42%{opacity:1; transform:translate(-50%, -50%) scale(1.06);}
+    100%{opacity:0.5; transform:translate(-50%, -50%) scale(1.38);}
+  }
+
+  @keyframes portalHalo{
+    0%{opacity:0; transform:translate(-50%, -50%) scale(0.3);}
+    22%{opacity:0.85; transform:translate(-50%, -50%) scale(0.9);}
+    60%{opacity:0.7; transform:translate(-50%, -50%) scale(1.18);}
+    100%{opacity:0; transform:translate(-50%, -50%) scale(1.5);}
+  }
+
+  @keyframes prismBeam{
+    0%{opacity:0; transform:translate(-50%, -50%) rotate(var(--prism-rot, -18deg)) scaleX(0.12);}
+    14%{opacity:0.85;}
+    30%{opacity:1; transform:translate(-50%, -50%) rotate(var(--prism-rot, -18deg)) scaleX(1.12);}
+    72%{opacity:0.8; transform:translate(-50%, -50%) rotate(var(--prism-rot, -18deg)) scaleX(1.42);}
+    100%{opacity:0; transform:translate(-50%, -50%) rotate(var(--prism-rot, -18deg)) scaleX(1.72);}
+  }
+
+  @keyframes prismFlash{
+    0%, 100%{opacity:0; transform:scale(0.8);} 
+    18%{opacity:0.9; transform:scale(1);} 
+    35%{opacity:0.5; transform:scale(1.05);} 
+    60%{opacity:0.15; transform:scale(1.2);} 
+  }
+
+  @keyframes finalHalo{
+    0%{opacity:0.2; transform:scale(0.8);} 
+    50%{opacity:0.95; transform:scale(1.12);} 
+    100%{opacity:0.25; transform:scale(1.28);} 
+  }
+
+  @keyframes finalShockwave{
+    0%{opacity:0; transform:scale(0.3);} 
+    12%{opacity:0.8; transform:scale(1);} 
+    40%{opacity:0.7; transform:scale(1.15);} 
+    100%{opacity:0; transform:scale(1.6);} 
+  }
+
+  @keyframes finalOrbit{
+    0%{transform:rotate(0deg) scale(0.8); opacity:0.3;} 
+    50%{transform:rotate(180deg) scale(1.08); opacity:0.8;} 
+    100%{transform:rotate(360deg) scale(1.2); opacity:0.2;} 
+  }
+
+  @keyframes finalSpark{
+    0%{opacity:0; transform:translate(0, 0) scale(0.3);} 
+    25%{opacity:1; transform:translate(0, -38px) scale(1);} 
+    100%{opacity:0; transform:translate(var(--spark-x, 30px), var(--spark-y, -110px)) scale(0.2);} 
+  }
+
+  .finalScoreCelebration,
+  .finalVerdictCelebration{
+    animation:finalScoreGlow 2.8s ease-in-out 0s 3 alternate;
+    text-shadow:0 0 20px rgba(255,255,255,0.4), 0 0 46px rgba(0,234,255,0.5), 0 0 68px rgba(255,0,149,0.26);
+  }
+
+  @keyframes finalScoreGlow{
+    0%{transform:scale(1); filter:brightness(1) saturate(1);} 
+    45%{transform:scale(1.08); filter:brightness(1.3) saturate(1.5);} 
+    100%{transform:scale(1); filter:brightness(1) saturate(1.2);} 
+  }
+
+  .finalScoreWrap,
+  .finalVerdictWrap{
+    opacity:0;
+    visibility:hidden;
+    transition:opacity 0.4s ease, visibility 0.4s ease;
+  }
+
+  .finalSlideReady .finalScoreWrap,
+  .finalSlideReady .finalVerdictWrap{
+    opacity:1;
+    visibility:visible;
   }
 
   .finalScore{
@@ -941,11 +1323,12 @@
 </head>
 <body>
 
-<button id="crazyToggle" class="crazyToggle" type="button" aria-label="Enable crazy mode" aria-pressed="false" title="Toggle crazy mode">Crazy</button>
+<button id="crazyToggle" class="crazyToggle" type="button" aria-label="Enable crazy mode" aria-pressed="false" title="Toggle crazy mode">crazy</button>
 
 <div id="crazyDisclaimer" class="crazyDisclaimer" hidden>
   <div class="crazyDisclaimerPanel" role="dialog" aria-modal="true" aria-labelledby="crazyDisclaimerTitle" aria-describedby="crazyDisclaimerText">
-    <h2 id="crazyDisclaimerTitle" class="crazyDisclaimerTitle">Orderly minds, be advised</h2>
+    <h2 id="crazyDisclaimerTitle" class="crazyDisclaimerTitle">Disclaimer</h2>
+    <p class="crazyDisclaimerSubtitle">Orderly minds, be advised</p>
     <p id="crazyDisclaimerText" class="crazyDisclaimerText"></p>
     <div class="crazyDisclaimerActions">
       <button id="crazyDisclaimerClose" class="smallBtn" type="button">Proceed anyway</button>
@@ -977,6 +1360,7 @@
   let listRevealTimers = [];
   let listRevealLoaderTimer = null;
   let confettiLock = false;
+  let celebrationTimers = [];
   let crazyResizeTimer = null;
   let crazyGlobalScene = null;
   let lastCrazyBackgroundIndex = -1;
@@ -1335,6 +1719,17 @@
     }
   }
 
+  function stopActiveAnimations(){
+    celebrationTimers.forEach(timer => clearTimeout(timer));
+    celebrationTimers = [];
+    document.querySelectorAll(".celebrationLayer, .confettiLayer").forEach(layer => layer.remove());
+    document.querySelectorAll(".finalScoreCelebration, .finalVerdictCelebration").forEach(el => {
+      el.classList.remove("finalScoreCelebration", "finalVerdictCelebration");
+    });
+    document.querySelectorAll(".finalSlideReady").forEach(el => el.classList.remove("finalSlideReady"));
+    confettiLock = false;
+  }
+
   function launchConfettiCannon(){
     if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     if (confettiLock) return;
@@ -1408,10 +1803,142 @@
 
     document.body.appendChild(layer);
 
-    window.setTimeout(() => {
+    const timerId = window.setTimeout(() => {
       layer.remove();
       confettiLock = false;
     }, 4400);
+    celebrationTimers.push(timerId);
+  }
+
+  function launchBarrageCelebration(onComplete){
+    if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    const sparkColors = ["#ff4db8", "#00eaff", "#ffe66d", "#7cf7a1", "#c77dff", "#ff8f6b", "#9ef01a", "#7bdff2", "#ffb703", "#ff006e"];
+
+    const layer = document.createElement("div");
+    layer.className = "celebrationLayer celebrationBarrage";
+
+    const core = document.createElement("div");
+    core.className = "barrageCore";
+    layer.appendChild(core);
+
+    const burst = document.createElement("div");
+    burst.className = "barrageBurst";
+    layer.appendChild(burst);
+
+    const rings = document.createElement("div");
+    rings.className = "barrageRings";
+    layer.appendChild(rings);
+
+    for (let index = 0; index < 3; index++) {
+      const streak = document.createElement("div");
+      streak.className = "barrageStreak s" + (index + 1);
+      streak.style.setProperty("--barrage-rot", ["-18deg", "18deg", "-6deg"][index]);
+      streak.style.animationDelay = (index * 0.8) + "s";
+      layer.appendChild(streak);
+    }
+
+    for (let index = 0; index < 50; index++) {
+      const spark = document.createElement("div");
+      spark.className = "barrageSpark s" + ((index % 5) + 1);
+      const angle = (index / 50) * Math.PI * 2;
+      const radius = 150 + Math.random() * 180;
+      const color = sparkColors[index % sparkColors.length];
+      spark.style.left = "50%";
+      spark.style.top = "50%";
+      spark.style.setProperty("--spark-color", color);
+      spark.style.setProperty("--spark-glow", color);
+      spark.style.setProperty("--spark-x", (Math.cos(angle) * radius).toFixed(2) + "px");
+      spark.style.setProperty("--spark-y", (Math.sin(angle) * radius).toFixed(2) + "px");
+      spark.style.animationDelay = (index * 0.08) + "s";
+      layer.appendChild(spark);
+    }
+
+    const ghost = document.createElement("div");
+    ghost.className = "celebrationGhost";
+    ghost.textContent = "question 25";
+    layer.appendChild(ghost);
+
+    document.body.appendChild(layer);
+
+    const timerId = window.setTimeout(() => {
+      layer.remove();
+      if (typeof onComplete === "function") onComplete();
+    }, 30000);
+    celebrationTimers.push(timerId);
+  }
+
+  function launchFinalCelebration(){
+    if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    const sparkColors = ["#ff4db8", "#00eaff", "#ffe66d", "#7cf7a1", "#c77dff", "#ff8f6b", "#9ef01a", "#7bdff2", "#ffb703", "#ff006e"];
+
+    const layer = document.createElement("div");
+    layer.className = "celebrationLayer celebrationFinal";
+
+    const halo = document.createElement("div");
+    halo.className = "finalHalo";
+    layer.appendChild(halo);
+
+    const shockwave = document.createElement("div");
+    shockwave.className = "finalShockwave";
+    layer.appendChild(shockwave);
+
+    const orbit = document.createElement("div");
+    orbit.className = "finalOrbit";
+    layer.appendChild(orbit);
+
+    const prismFlash = document.createElement("div");
+    prismFlash.className = "prismFlash";
+    layer.appendChild(prismFlash);
+
+    const portalHalo = document.createElement("div");
+    portalHalo.className = "portalHalo";
+    layer.appendChild(portalHalo);
+
+    const portalRing = document.createElement("div");
+    portalRing.className = "portalRing";
+    layer.appendChild(portalRing);
+
+    ["-18deg", "18deg", "-6deg"].forEach((rotation, index) => {
+      const beam = document.createElement("div");
+      beam.className = "prismBeam beam" + (index + 1);
+      beam.style.setProperty("--prism-rot", rotation);
+      beam.style.animationDelay = (index * 0.9) + "s";
+      layer.appendChild(beam);
+    });
+
+    const finalScore = document.querySelector(".finalScore");
+    const finalVerdict = document.querySelector(".finalVerdict");
+    if (finalScore) finalScore.classList.add("finalScoreCelebration");
+    if (finalVerdict) finalVerdict.classList.add("finalVerdictCelebration");
+
+    for (let index = 0; index < 180; index++) {
+      const spark = document.createElement("div");
+      spark.className = "finalSpark";
+      const angle = (index / 180) * Math.PI * 2;
+      const radius = 120 + Math.random() * 200;
+      const color = sparkColors[index % sparkColors.length];
+      spark.style.left = "50%";
+      spark.style.top = "50%";
+      spark.style.setProperty("--spark-color", color);
+      spark.style.setProperty("--spark-glow", color);
+      spark.style.setProperty("--spark-x", (Math.cos(angle) * radius).toFixed(2) + "px");
+      spark.style.setProperty("--spark-y", (Math.sin(angle) * radius).toFixed(2) + "px");
+      spark.style.animationDelay = (index * 0.05) + "s";
+      layer.appendChild(spark);
+    }
+
+    document.body.appendChild(layer);
+
+    const revealFinal = () => {
+      const finalSlide = document.querySelector(".finalSlide");
+      if (finalSlide) finalSlide.classList.add("finalSlideReady");
+      layer.remove();
+    };
+
+    const timerId = window.setTimeout(revealFinal, 30000);
+    celebrationTimers.push(timerId);
   }
 
   function reserveListRevealHeight(answerText){
@@ -1592,11 +2119,12 @@
     crazyToggle.setAttribute("aria-pressed", crazyMode ? "true" : "false");
     crazyToggle.setAttribute("aria-label", crazyMode ? "Disable crazy mode" : "Enable crazy mode");
     crazyToggle.title = crazyMode ? "Disable crazy mode" : "Enable crazy mode";
+    crazyToggle.textContent = crazyMode ? "sane" : "crazy";
   }
 
   function getCrazyDisclaimerMessage(){
     if (crazyDisclaimerCount === 0) {
-      return "Satirical disclaimer: crazy mode may cause mild distress to lovers of tidy alignment, calm palettes, and respectable restraint. Proceed only if you are prepared for colours to unionise and decorum to leave the building.";
+      return "Crazy mode may cause distress to lovers of tidy alignment, calm palettes, and respectable restraint. Proceed only if you are prepared for colours to unionise and decorum to leave the building.";
     }
     return "Look, I've already warned you — this is still an unhelpfully vibrant decision.";
   }
@@ -2040,6 +2568,12 @@
 
   function setCrazyMode(enabled){
     crazyMode = !!enabled;
+    if (!crazyMode) {
+      stopActiveAnimations();
+      if (slides.length) {
+        renderCurrent();
+      }
+    }
     try {
       window.localStorage.setItem(CRAZY_MODE_STORAGE_KEY, crazyMode ? "true" : "false");
     } catch (_) {}
@@ -2163,13 +2697,14 @@
 
       const titleSlide = slides[0];
       stage.innerHTML =
-        '<div class="slideInner">' +
-          '<div class="qNumber">Final Score</div>' +
-          '<div class="finalScore">' + score + ' / ' + total + '</div>' +
-          '<div class="finalVerdict">' + verdict + '</div>' +
-          (titleSlide.notes ? '<div class="finalNotes">' + titleSlide.notes + '</div>' : "") +
-          '<button class="ghostBtn" id="restartBtn" type="button">Restart Quiz</button>' +
+        '<div class="slideInner finalSlide">' +
+          '<div class="finalScoreWrap"><div class="qNumber">Final Score</div><div class="finalScore">' + score + ' / ' + total + '</div><div class="finalVerdict">' + verdict + '</div></div>' +
+          (titleSlide.notes ? '<div class="finalNotes finalScoreWrap">' + titleSlide.notes + '</div>' : "") +
+          '<div class="finalScoreWrap"><button class="ghostBtn" id="restartBtn" type="button">Restart Quiz</button></div>' +
         '</div>';
+
+      const finalSlideEl = stage.querySelector(".finalSlide");
+      if (finalSlideEl) finalSlideEl.classList.remove("finalSlideReady");
 
       document.getElementById("restartBtn").addEventListener("click", () => {
         slides.forEach(s => {
@@ -2187,6 +2722,12 @@
         clearAutoAdvance();
         goTo(0);
       });
+      if (crazyMode) {
+        launchFinalCelebration();
+      } else {
+        if (finalSlideEl) finalSlideEl.classList.add("finalSlideReady");
+        launchConfettiCannon();
+      }
       refreshCrazyPresentation({ rerandomizeFonts: true, rerandomizeMotion: true, fontRoots: [stage, scoreboard, progressTrack, crazyToggle], motionRoots: [stage, scoreboard, progressTrack, crazyToggle] });
     }
   }
@@ -2203,9 +2744,29 @@
     const slide = slides[current];
     if (slide.type !== "question" || !slide.revealed) return;
     slide.mark = value;
-    if ((String(slide.number) === "25" || String(slide.number) === "50") && !slide.confettiTriggered) {
+
+    if (String(slide.number) === "25" && !slide.confettiTriggered) {
       slide.confettiTriggered = true;
-      launchConfettiCannon();
+      if (crazyMode) {
+        stage.innerHTML = '<div class="slideInner celebrationStage"><div class="celebrationGhost">Question 25</div></div>';
+        launchBarrageCelebration(() => {
+          goTo(current + 1);
+        });
+      } else {
+        launchConfettiCannon();
+        renderCurrent();
+        scheduleAutoAdvance();
+      }
+      return;
+    }
+
+    if (String(slide.number) === "50" && !slide.confettiTriggered) {
+      slide.confettiTriggered = true;
+      if (crazyMode) {
+        launchFinalCelebration();
+      } else {
+        launchConfettiCannon();
+      }
     }
     renderCurrent();
     scheduleAutoAdvance();
