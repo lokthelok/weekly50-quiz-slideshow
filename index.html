@@ -761,9 +761,12 @@
   let listRevealTimers = [];
   let listRevealLoaderTimer = null;
   let confettiLock = false;
+  let crazyResizeTimer = null;
   let crazyMode = false;
 
-  const CRAZY_FONTS = [
+  const CRAZY_MODE_STORAGE_KEY = "weekly50-crazy-mode";
+
+  const CRAZY_DISPLAY_FONTS = [
     '"Trebuchet MS", "Comic Sans MS", cursive, sans-serif',
     'Impact, Haettenschweiler, "Arial Black", sans-serif',
     '"Courier New", Courier, monospace',
@@ -773,6 +776,16 @@
     '"Palatino Linotype", "Book Antiqua", Palatino, serif',
     '"Verdana", Geneva, sans-serif',
     '"Arial Rounded MT Bold", "Trebuchet MS", sans-serif'
+  ];
+
+  const CRAZY_CONTROL_FONTS = [
+    '"Trebuchet MS", Verdana, Arial, sans-serif',
+    '"Arial", "Helvetica Neue", Helvetica, sans-serif',
+    '"Gill Sans", "Trebuchet MS", sans-serif',
+    '"Verdana", Geneva, sans-serif',
+    '"Segoe UI", Tahoma, Geneva, sans-serif',
+    '"Arial Rounded MT Bold", "Trebuchet MS", sans-serif',
+    '"Lucida Sans Unicode", "Lucida Grande", sans-serif'
   ];
 
   const stage = document.getElementById("stage");
@@ -1245,14 +1258,19 @@
   }
 
   function randomCrazyFont(){
-    return CRAZY_FONTS[Math.floor(Math.random() * CRAZY_FONTS.length)];
+    return CRAZY_DISPLAY_FONTS[Math.floor(Math.random() * CRAZY_DISPLAY_FONTS.length)];
+  }
+
+  function randomCrazyControlFont(){
+    return CRAZY_CONTROL_FONTS[Math.floor(Math.random() * CRAZY_CONTROL_FONTS.length)];
   }
 
   function randomizeVisibleFonts(){
     const all = [document.body].concat(Array.from(document.body.querySelectorAll("*")));
     all.forEach(el => {
       if (el.tagName === "SCRIPT" || el.tagName === "STYLE") return;
-      el.style.fontFamily = randomCrazyFont();
+      const isControl = el.matches("button, input, textarea, summary, code");
+      el.style.fontFamily = isControl ? randomCrazyControlFont() : randomCrazyFont();
       el.setAttribute("data-crazy-font", "true");
     });
   }
@@ -1328,21 +1346,13 @@
     const buttons = Array.from(stage.querySelectorAll(".markBtn"));
     if (!buttons.length) return [];
 
-    const slideInner = stage.querySelector(".slideInner");
     const qText = stage.querySelector(".qText");
     const answerWrap = stage.querySelector(".answerWrap");
+    const qNumber = stage.querySelector(".qNumber");
     const navCorner = stage.querySelector(".navCorner");
     const reservedRects = [];
 
-    if (slideInner) {
-      const innerRect = slideInner.getBoundingClientRect();
-      reservedRects.push({
-        left: Math.max(0, innerRect.left + 24),
-        top: Math.max(0, innerRect.top + 18),
-        right: Math.min(window.innerWidth, innerRect.right - 24),
-        bottom: Math.min(window.innerHeight, innerRect.bottom - 18)
-      });
-    }
+    if (qNumber) reservedRects.push(expandRect(qNumber.getBoundingClientRect(), 18));
     if (qText) reservedRects.push(expandRect(qText.getBoundingClientRect(), 24));
     if (answerWrap) reservedRects.push(expandRect(answerWrap.getBoundingClientRect(), 20));
     if (navCorner) reservedRects.push(expandRect(navCorner.getBoundingClientRect(), 18));
@@ -1406,6 +1416,9 @@
 
   function setCrazyMode(enabled){
     crazyMode = !!enabled;
+    try {
+      window.localStorage.setItem(CRAZY_MODE_STORAGE_KEY, crazyMode ? "true" : "false");
+    } catch (_) {}
     if (slides.length && slides[current]) {
       if (slides[current].type === "question") slides[current].crazyButtonLayout = null;
       renderCurrent();
@@ -1626,15 +1639,27 @@
   }, { passive: true });
 
   window.addEventListener("resize", () => {
-    if (!crazyMode || !slides.length || !slides[current] || slides[current].type !== "question") return;
-    slides[current].crazyButtonLayout = null;
-    refreshCrazyPresentation();
+    if (!crazyMode) return;
+    if (crazyResizeTimer) clearTimeout(crazyResizeTimer);
+    crazyResizeTimer = window.setTimeout(() => {
+      crazyResizeTimer = null;
+      if (slides.length && slides[current] && slides[current].type === "question") {
+        slides[current].crazyButtonLayout = null;
+      }
+      refreshCrazyPresentation();
+    }, 120);
   });
 
   crazyToggle.addEventListener("click", () => {
     setCrazyMode(!crazyMode);
   });
 
+  try {
+    crazyMode = window.localStorage.getItem(CRAZY_MODE_STORAGE_KEY) === "true";
+  } catch (_) {
+    crazyMode = false;
+  }
+  syncCrazyToggle();
   autoLoad();
 })();
 </script>
