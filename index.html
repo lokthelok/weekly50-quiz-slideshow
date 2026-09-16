@@ -24,7 +24,37 @@
     color:var(--text);
     font-family:var(--font-main);
   }
-  body{overflow:hidden;}
+  body{
+    overflow:hidden;
+    position:relative;
+    transition:background 0.5s ease, color 0.3s ease;
+  }
+
+  body::before,
+  body::after{
+    content:"";
+    position:fixed;
+    inset:-20%;
+    pointer-events:none;
+    opacity:0;
+    transition:opacity 0.4s ease;
+    z-index:-2;
+  }
+
+  body::before{
+    background:
+      radial-gradient(circle at 20% 20%, rgba(255,0,153,0.42), transparent 24%),
+      radial-gradient(circle at 80% 18%, rgba(0,238,255,0.36), transparent 26%),
+      radial-gradient(circle at 30% 80%, rgba(255,242,0,0.32), transparent 24%),
+      radial-gradient(circle at 75% 70%, rgba(124,77,255,0.36), transparent 24%);
+    background-size:120% 120%;
+  }
+
+  body::after{
+    background:
+      conic-gradient(from 0deg at 50% 50%, rgba(255,0,106,0.18), rgba(0,255,247,0.18), rgba(255,230,0,0.18), rgba(124,77,255,0.18), rgba(255,0,106,0.18));
+    mix-blend-mode:screen;
+  }
 
   @media (prefers-reduced-motion: reduce){
     *{animation-duration:0.001ms !important; transition-duration:0.001ms !important;}
@@ -369,6 +399,144 @@
     letter-spacing:normal;
   }
 
+  .crazyToggle{
+    position:fixed;
+    top:12px;
+    left:12px;
+    z-index:40;
+    width:24px;
+    height:24px;
+    padding:0;
+    border-radius:999px;
+    border:1px solid rgba(251,226,223,0.25);
+    background:rgba(0,7,22,0.22);
+    color:rgba(251,226,223,0.5);
+    font-size:12px;
+    line-height:1;
+    backdrop-filter:blur(10px);
+    opacity:0.3;
+    transition:opacity 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+
+  .crazyToggle:hover,
+  .crazyToggle:focus-visible,
+  .crazyToggle[aria-pressed="true"]{
+    opacity:0.95;
+    transform:scale(1.08);
+    border-color:rgba(255,255,255,0.78);
+    color:#fff;
+  }
+
+  body.crazy-mode{
+    --bg:#17001f;
+    --surface:rgba(18, 7, 34, 0.78);
+    --text:#fff9fd;
+    --muted:rgba(255,249,253,0.82);
+    --line:rgba(123,246,255,0.52);
+    --good:#d4ff00;
+    --bad:#ff4fd8;
+    background:
+      linear-gradient(120deg, #ff009d 0%, #6e00ff 20%, #00eaff 42%, #fff000 64%, #ff6a00 82%, #ff009d 100%);
+    background-size:300% 300%;
+    animation:crazyBackdrop 14s linear infinite;
+  }
+
+  body.crazy-mode::before,
+  body.crazy-mode::after{
+    opacity:1;
+    animation:crazyAurora 11s linear infinite alternate;
+  }
+
+  body.crazy-mode::after{
+    animation-duration:18s;
+  }
+
+  body.crazy-mode #progressTrack,
+  body.crazy-mode #scoreboard,
+  body.crazy-mode .panel,
+  body.crazy-mode .answerBox,
+  body.crazy-mode textarea,
+  body.crazy-mode .smallInput,
+  body.crazy-mode details,
+  body.crazy-mode .bigBtn,
+  body.crazy-mode .ghostBtn,
+  body.crazy-mode .revealBtn,
+  body.crazy-mode .smallBtn,
+  body.crazy-mode .markBtn,
+  body.crazy-mode .miniBtn{
+    color:#fff;
+    border-color:rgba(255,255,255,0.8);
+    box-shadow:0 0 0 1px rgba(255,255,255,0.08), 0 18px 38px rgba(20,0,40,0.32);
+  }
+
+  body.crazy-mode #progressTrack,
+  body.crazy-mode #scoreboard,
+  body.crazy-mode .panel,
+  body.crazy-mode .answerBox,
+  body.crazy-mode textarea,
+  body.crazy-mode .smallInput,
+  body.crazy-mode details{
+    background:linear-gradient(135deg, rgba(18,0,33,0.72), rgba(0,98,255,0.28), rgba(255,0,149,0.34));
+    backdrop-filter:blur(12px) saturate(1.3);
+  }
+
+  body.crazy-mode .bigBtn,
+  body.crazy-mode .ghostBtn,
+  body.crazy-mode .revealBtn,
+  body.crazy-mode .smallBtn,
+  body.crazy-mode .markBtn,
+  body.crazy-mode .miniBtn{
+    background:linear-gradient(120deg, rgba(255,0,149,0.82), rgba(0,234,255,0.74), rgba(255,230,0,0.78));
+    text-shadow:0 1px 0 rgba(0,0,0,0.35);
+  }
+
+  body.crazy-mode .bigBtn,
+  body.crazy-mode .ghostBtn,
+  body.crazy-mode .revealBtn,
+  body.crazy-mode .smallBtn,
+  body.crazy-mode .markBtn{
+    background-size:200% 200%;
+    animation:crazyControls 5s linear infinite;
+  }
+
+  body.crazy-mode .miniBtn{
+    color:#17001f;
+  }
+
+  body.crazy-mode .markBtn.correct.active{
+    color:#101b00;
+    border-color:#f5ff74;
+    background:linear-gradient(120deg, #d4ff00, #44ffd2, #f8ff8a);
+  }
+
+  body.crazy-mode .markBtn.incorrect.active{
+    color:#fff3ff;
+    border-color:#ffd0f6;
+    background:linear-gradient(120deg, #ff4fd8, #ff8a00, #ff0062);
+  }
+
+  body.crazy-mode .markBtn.crazyFloat{
+    position:fixed;
+    z-index:26;
+    max-width:min(260px, 72vw);
+    margin:0;
+  }
+
+  body.crazy-mode .qText,
+  body.crazy-mode .answerText,
+  body.crazy-mode .finalScore,
+  body.crazy-mode .finalVerdict,
+  body.crazy-mode .wordmark{
+    text-shadow:0 3px 18px rgba(0,0,0,0.35);
+  }
+
+  body.crazy-mode .crazyToggle{
+    border-color:rgba(255,255,255,0.8);
+    background:linear-gradient(140deg, rgba(255,0,149,0.82), rgba(0,234,255,0.72), rgba(255,230,0,0.72));
+    color:#fff;
+    box-shadow:0 0 22px rgba(255,255,255,0.26);
+  }
+
   .confettiLayer{
     position:fixed;
     inset:0;
@@ -533,6 +701,24 @@
 
   @keyframes spin{to{transform:rotate(360deg);}}
 
+  @keyframes crazyBackdrop{
+    0%{background-position:0% 50%;}
+    50%{background-position:100% 50%;}
+    100%{background-position:0% 50%;}
+  }
+
+  @keyframes crazyAurora{
+    0%{transform:translate3d(-2%, -1%, 0) rotate(0deg) scale(1);}
+    50%{transform:translate3d(3%, 2%, 0) rotate(10deg) scale(1.08);}
+    100%{transform:translate3d(-1%, 4%, 0) rotate(-7deg) scale(1.04);}
+  }
+
+  @keyframes crazyControls{
+    0%{background-position:0% 50%; filter:hue-rotate(0deg);}
+    50%{background-position:100% 50%; filter:hue-rotate(28deg);}
+    100%{background-position:0% 50%; filter:hue-rotate(0deg);}
+  }
+
   @media (max-width:1024px){
     #stage{padding:10px 5vw 12vh;}
     .markBtn{min-width:160px;}
@@ -548,6 +734,8 @@
 </style>
 </head>
 <body>
+
+<button id="crazyToggle" class="crazyToggle" type="button" aria-label="Enable crazy mode" aria-pressed="false" title="Toggle crazy mode">✦</button>
 
 <div id="app">
   <div id="progressTrack"><div id="progressFill"></div></div>
@@ -573,12 +761,26 @@
   let listRevealTimers = [];
   let listRevealLoaderTimer = null;
   let confettiLock = false;
+  let crazyMode = false;
+
+  const CRAZY_FONTS = [
+    '"Trebuchet MS", "Comic Sans MS", cursive, sans-serif',
+    'Impact, Haettenschweiler, "Arial Black", sans-serif',
+    '"Courier New", Courier, monospace',
+    '"Georgia", "Times New Roman", serif',
+    '"Lucida Console", Monaco, monospace',
+    '"Brush Script MT", "Segoe Script", cursive',
+    '"Palatino Linotype", "Book Antiqua", Palatino, serif',
+    '"Verdana", Geneva, sans-serif',
+    '"Arial Rounded MT Bold", "Trebuchet MS", sans-serif'
+  ];
 
   const stage = document.getElementById("stage");
   const progressFill = document.getElementById("progressFill");
   const scoreboard = document.getElementById("scoreboard");
   const scoreVal = document.getElementById("scoreVal");
   const scoreTotal = document.getElementById("scoreTotal");
+  const crazyToggle = document.getElementById("crazyToggle");
 
   function sanitizeFragment(html){
     const doc = new DOMParser().parseFromString("<div>" + html + "</div>", "text/html");
@@ -758,7 +960,8 @@
         answerHTML: q.answerHTML,
         revealed: false,
         listRevealPending: false,
-        mark: null
+        mark: null,
+        crazyButtonLayout: null
       });
     });
     slides.push({ type: "final" });
@@ -957,6 +1160,7 @@
         '<div class="spinner"></div>' +
         '<div class="statusLine"><span class="dot"></span> Fetching this week\'s fifty...</div>' +
       '</div>';
+    refreshCrazyPresentation();
   }
 
   function renderLoadError(err){
@@ -1024,12 +1228,190 @@
         errEl.style.display = "block";
       }
     });
+
+    refreshCrazyPresentation();
   }
 
   function escapeHTML(str){
     const d = document.createElement("div");
     d.textContent = str;
     return d.innerHTML;
+  }
+
+  function syncCrazyToggle(){
+    crazyToggle.setAttribute("aria-pressed", crazyMode ? "true" : "false");
+    crazyToggle.setAttribute("aria-label", crazyMode ? "Disable crazy mode" : "Enable crazy mode");
+    crazyToggle.title = crazyMode ? "Disable crazy mode" : "Enable crazy mode";
+  }
+
+  function randomCrazyFont(){
+    return CRAZY_FONTS[Math.floor(Math.random() * CRAZY_FONTS.length)];
+  }
+
+  function randomizeVisibleFonts(){
+    const all = [document.body].concat(Array.from(document.body.querySelectorAll("*")));
+    all.forEach(el => {
+      if (el.tagName === "SCRIPT" || el.tagName === "STYLE") return;
+      el.style.fontFamily = randomCrazyFont();
+      el.setAttribute("data-crazy-font", "true");
+    });
+  }
+
+  function clearCrazyFonts(){
+    document.querySelectorAll("[data-crazy-font]").forEach(el => {
+      el.style.fontFamily = "";
+      el.removeAttribute("data-crazy-font");
+    });
+    document.body.style.fontFamily = "";
+  }
+
+  function clearCrazyButtonLayout(){
+    stage.querySelectorAll(".markBtn").forEach(btn => {
+      btn.classList.remove("crazyFloat");
+      btn.style.left = "";
+      btn.style.top = "";
+      btn.style.width = "";
+    });
+  }
+
+  function expandRect(rect, padding){
+    return {
+      left: rect.left - padding,
+      top: rect.top - padding,
+      right: rect.right + padding,
+      bottom: rect.bottom + padding
+    };
+  }
+
+  function rectsOverlap(a, b){
+    return !(a.right <= b.left || a.left >= b.right || a.bottom <= b.top || a.top >= b.bottom);
+  }
+
+  function chooseCrazyButtonSpot(size, reservedRects, placedRects){
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    const xRange = Math.max(1, viewportWidth - size.width - 24);
+    const yRange = Math.max(1, viewportHeight - size.height - 82);
+
+    for (let attempt = 0; attempt < 120; attempt++) {
+      const left = 12 + Math.random() * xRange;
+      const top = 58 + Math.random() * yRange;
+      const rect = { left, top, right: left + size.width, bottom: top + size.height };
+      if (reservedRects.some(area => rectsOverlap(rect, area))) continue;
+      if (placedRects.some(area => rectsOverlap(rect, area))) continue;
+      return { left, top, rect };
+    }
+
+    const fallbackSpots = [
+      { left: 12, top: Math.max(58, viewportHeight - size.height - 20) },
+      { left: Math.max(12, viewportWidth - size.width - 12), top: Math.max(58, viewportHeight - size.height - 20) },
+      { left: 12, top: 82 },
+      { left: Math.max(12, viewportWidth - size.width - 12), top: 82 }
+    ];
+
+    for (let index = 0; index < fallbackSpots.length; index++) {
+      const spot = fallbackSpots[index];
+      const rect = { left: spot.left, top: spot.top, right: spot.left + size.width, bottom: spot.top + size.height };
+      if (reservedRects.some(area => rectsOverlap(rect, area))) continue;
+      if (placedRects.some(area => rectsOverlap(rect, area))) continue;
+      return { left: spot.left, top: spot.top, rect };
+    }
+
+    return {
+      left: 12,
+      top: Math.max(58, viewportHeight - size.height - 20),
+      rect: { left: 12, top: Math.max(58, viewportHeight - size.height - 20), right: 12 + size.width, bottom: Math.max(58, viewportHeight - size.height - 20) + size.height }
+    };
+  }
+
+  function computeCrazyButtonLayout(){
+    const buttons = Array.from(stage.querySelectorAll(".markBtn"));
+    if (!buttons.length) return [];
+
+    const slideInner = stage.querySelector(".slideInner");
+    const qText = stage.querySelector(".qText");
+    const answerWrap = stage.querySelector(".answerWrap");
+    const navCorner = stage.querySelector(".navCorner");
+    const reservedRects = [];
+
+    if (slideInner) {
+      const innerRect = slideInner.getBoundingClientRect();
+      reservedRects.push({
+        left: Math.max(0, innerRect.left + 24),
+        top: Math.max(0, innerRect.top + 18),
+        right: Math.min(window.innerWidth, innerRect.right - 24),
+        bottom: Math.min(window.innerHeight, innerRect.bottom - 18)
+      });
+    }
+    if (qText) reservedRects.push(expandRect(qText.getBoundingClientRect(), 24));
+    if (answerWrap) reservedRects.push(expandRect(answerWrap.getBoundingClientRect(), 20));
+    if (navCorner) reservedRects.push(expandRect(navCorner.getBoundingClientRect(), 18));
+    if (scoreboard.style.display !== "none") reservedRects.push(expandRect(scoreboard.getBoundingClientRect(), 18));
+    reservedRects.push(expandRect(crazyToggle.getBoundingClientRect(), 18));
+
+    const placedRects = [];
+
+    return buttons.map(btn => {
+      const rect = btn.getBoundingClientRect();
+      const size = {
+        width: Math.max(Math.ceil(rect.width), 156),
+        height: Math.max(Math.ceil(rect.height), 52)
+      };
+      const spot = chooseCrazyButtonSpot(size, reservedRects, placedRects);
+      placedRects.push(spot.rect);
+      return { left: spot.left, top: spot.top, width: size.width };
+    });
+  }
+
+  function applyCrazyButtonLayout(slide){
+    const buttons = Array.from(stage.querySelectorAll(".markBtn"));
+    if (!buttons.length) return;
+
+    const viewportKey = window.innerWidth + "x" + window.innerHeight;
+    if (!slide.crazyButtonLayout || slide.crazyButtonLayout.viewportKey !== viewportKey) {
+      slide.crazyButtonLayout = {
+        viewportKey,
+        positions: computeCrazyButtonLayout()
+      };
+    }
+
+    buttons.forEach((btn, index) => {
+      const spot = slide.crazyButtonLayout.positions[index];
+      if (!spot) return;
+      btn.classList.add("crazyFloat");
+      btn.style.left = spot.left + "px";
+      btn.style.top = spot.top + "px";
+      btn.style.width = spot.width + "px";
+    });
+  }
+
+  function refreshCrazyPresentation(){
+    document.body.classList.toggle("crazy-mode", crazyMode);
+    syncCrazyToggle();
+
+    if (!crazyMode) {
+      clearCrazyFonts();
+      clearCrazyButtonLayout();
+      return;
+    }
+
+    randomizeVisibleFonts();
+    const slide = slides[current];
+    if (slide && slide.type === "question" && slide.revealed) {
+      applyCrazyButtonLayout(slide);
+    } else {
+      clearCrazyButtonLayout();
+    }
+  }
+
+  function setCrazyMode(enabled){
+    crazyMode = !!enabled;
+    if (slides.length && slides[current]) {
+      if (slides[current].type === "question") slides[current].crazyButtonLayout = null;
+      renderCurrent();
+    } else {
+      refreshCrazyPresentation();
+    }
   }
 
   function totalQuestions(){
@@ -1076,6 +1458,7 @@
         '</div>';
 
       document.getElementById("startBtn").addEventListener("click", () => goTo(current + 1));
+      refreshCrazyPresentation();
       return;
     }
 
@@ -1126,6 +1509,7 @@
       });
 
       setupListReveal(slide);
+      refreshCrazyPresentation();
       return;
     }
 
@@ -1157,11 +1541,14 @@
             s.revealed = false;
             s.mark = null;
             s.confettiTriggered = false;
+            s.listRevealPending = false;
+            s.crazyButtonLayout = null;
           }
         });
         clearAutoAdvance();
         goTo(0);
       });
+      refreshCrazyPresentation();
     }
   }
 
@@ -1191,6 +1578,9 @@
     current = index;
     if (slides[current] && slides[current].type === "question" && current > maxVisitedQuestionIndex) {
       maxVisitedQuestionIndex = current;
+    }
+    if (slides[current] && slides[current].type === "question") {
+      slides[current].crazyButtonLayout = null;
     }
     renderCurrent();
   }
@@ -1234,6 +1624,16 @@
     if (dx < 0) goTo(current + 1);
     if (dx > 0) goTo(current - 1);
   }, { passive: true });
+
+  window.addEventListener("resize", () => {
+    if (!crazyMode || !slides.length || !slides[current] || slides[current].type !== "question") return;
+    slides[current].crazyButtonLayout = null;
+    refreshCrazyPresentation();
+  });
+
+  crazyToggle.addEventListener("click", () => {
+    setCrazyMode(!crazyMode);
+  });
 
   autoLoad();
 })();
