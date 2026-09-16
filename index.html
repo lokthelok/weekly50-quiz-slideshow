@@ -1308,6 +1308,7 @@
     const fallbackSelector = "div, span, p, a, li, ul, ol, em, strong, b";
 
     roots.forEach(root => {
+      clearCrazyFonts(root);
       groups.forEach(group => {
         setFontOnSelector(root, group.selector, group.font);
       });
@@ -1322,12 +1323,17 @@
     });
   }
 
-  function clearCrazyFonts(){
-    document.querySelectorAll("[data-crazy-font]").forEach(el => {
+  function clearCrazyFonts(scope){
+    const root = scope || document;
+    if (root !== document && root.getAttribute && root.getAttribute("data-crazy-font")) {
+      root.style.fontFamily = "";
+      root.removeAttribute("data-crazy-font");
+    }
+    root.querySelectorAll("[data-crazy-font]").forEach(el => {
       el.style.fontFamily = "";
       el.removeAttribute("data-crazy-font");
     });
-    document.body.style.fontFamily = "";
+    if (!scope) document.body.style.fontFamily = "";
   }
 
   function clearCrazyButtonLayout(){
@@ -1410,7 +1416,7 @@
 
     const placedRects = [];
 
-    return buttons.map(btn => {
+    const positions = buttons.map(btn => {
       const rect = btn.getBoundingClientRect();
       const size = {
         width: Math.max(Math.ceil(rect.width), 156),
@@ -1420,6 +1426,8 @@
       placedRects.push(spot.rect);
       return { left: spot.left, top: spot.top, width: size.width };
     });
+    positions.sort((a, b) => a.top - b.top || a.left - b.left);
+    return positions;
   }
 
   function applyCrazyButtonLayout(slide){
