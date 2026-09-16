@@ -1405,7 +1405,7 @@
     if (qText) reservedRects.push(expandRect(qText.getBoundingClientRect(), 24));
     if (answerWrap) reservedRects.push(expandRect(answerWrap.getBoundingClientRect(), 20));
     if (navCorner) reservedRects.push(expandRect(navCorner.getBoundingClientRect(), 18));
-    if (scoreboard.style.display !== "none") reservedRects.push(expandRect(scoreboard.getBoundingClientRect(), 18));
+    if (scoreboard.getClientRects().length) reservedRects.push(expandRect(scoreboard.getBoundingClientRect(), 18));
     reservedRects.push(expandRect(crazyToggle.getBoundingClientRect(), 18));
 
     const placedRects = [];
@@ -1719,7 +1719,6 @@
   }
 
   window.addEventListener("resize", handleCrazyViewportChange);
-  window.addEventListener("orientationchange", handleCrazyViewportChange);
 
   crazyToggle.addEventListener("click", () => {
     setCrazyMode(!crazyMode);
