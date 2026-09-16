@@ -439,6 +439,10 @@
     color:#fff;
   }
 
+  .crazyToggle[aria-pressed="true"]{
+    box-shadow:0 0 0 2px rgba(255,255,255,0.22), 0 0 18px rgba(255,0,149,0.24);
+  }
+
   .crazyToggle:focus-visible{
     opacity:1;
     outline:3px solid #fff;
@@ -1503,7 +1507,8 @@
     if (slides.length && slides[current] && slides[current].type === "question") {
       slides[current].crazyButtonLayout = null;
     }
-    refreshCrazyPresentation({ rerandomizeFonts: crazyMode, fontRoots: [document.body] });
+    const roots = slides.length ? [stage, scoreboard, progressFill.parentElement, crazyToggle] : [document.body];
+    refreshCrazyPresentation({ rerandomizeFonts: crazyMode, fontRoots: roots });
   }
 
   function totalQuestions(){
