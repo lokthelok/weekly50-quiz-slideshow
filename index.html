@@ -1413,7 +1413,15 @@
     if (!buttons.length) return;
 
     const viewportKey = window.innerWidth + "x" + window.innerHeight;
-    const contentKey = slide.number + "|" + slide.revealed + "|" + slide.questionHTML.length + "|" + slide.answerHTML.length;
+    const contentKey = [
+      slide.number,
+      slide.revealed,
+      slide.questionHTML.length,
+      slide.answerHTML.length,
+      hideLiveScore,
+      scoreSoFar(),
+      totalQuestions()
+    ].join("|");
     if (!slide.crazyButtonLayout || slide.crazyButtonLayout.viewportKey !== viewportKey || slide.crazyButtonLayout.contentKey !== contentKey) {
       slide.crazyButtonLayout = {
         viewportKey,
@@ -1434,6 +1442,7 @@
 
   function refreshCrazyPresentation(options){
     const settings = options || {};
+    const prefersReduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     document.body.classList.toggle("crazy-mode", crazyMode);
     syncCrazyToggle();
 
@@ -1443,7 +1452,7 @@
       return;
     }
 
-    if (settings.rerandomizeFonts) {
+    if (settings.rerandomizeFonts && (!prefersReduced || !document.querySelector("[data-crazy-font]"))) {
       randomizeFontsInRoots(settings.fontRoots || [document.body]);
     }
     const slide = slides[current];
