@@ -581,6 +581,52 @@
     box-shadow:0 0 22px rgba(255,255,255,0.26);
   }
 
+  .crazyDisclaimer{
+    position:fixed;
+    inset:0;
+    z-index:60;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+    background:rgba(10, 0, 16, 0.6);
+    backdrop-filter:blur(10px);
+  }
+
+  .crazyDisclaimer[hidden]{
+    display:none;
+  }
+
+  .crazyDisclaimerPanel{
+    width:min(100%, 520px);
+    padding:24px 24px 20px;
+    border-radius:20px;
+    border:1px solid rgba(255,255,255,0.48);
+    background:linear-gradient(135deg, rgba(255,0,149,0.88), rgba(37,0,89,0.92), rgba(0,234,255,0.72));
+    box-shadow:0 26px 70px rgba(0,0,0,0.45);
+    color:#fff;
+    text-align:left;
+  }
+
+  .crazyDisclaimerTitle{
+    margin:0 0 10px;
+    font-size:clamp(22px, 4vw, 30px);
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+  }
+
+  .crazyDisclaimerText{
+    margin:0;
+    font-size:15px;
+    line-height:1.6;
+  }
+
+  .crazyDisclaimerActions{
+    margin-top:18px;
+    display:flex;
+    justify-content:flex-end;
+  }
+
   .confettiLayer{
     position:fixed;
     inset:0;
@@ -897,6 +943,16 @@
 
 <button id="crazyToggle" class="crazyToggle" type="button" aria-label="Enable crazy mode" aria-pressed="false" title="Toggle crazy mode">Crazy</button>
 
+<div id="crazyDisclaimer" class="crazyDisclaimer" hidden>
+  <div class="crazyDisclaimerPanel" role="dialog" aria-modal="true" aria-labelledby="crazyDisclaimerTitle" aria-describedby="crazyDisclaimerText">
+    <h2 id="crazyDisclaimerTitle" class="crazyDisclaimerTitle">Orderly minds, be advised</h2>
+    <p id="crazyDisclaimerText" class="crazyDisclaimerText"></p>
+    <div class="crazyDisclaimerActions">
+      <button id="crazyDisclaimerClose" class="smallBtn" type="button">Proceed anyway</button>
+    </div>
+  </div>
+</div>
+
 <div id="app">
   <div id="progressTrack"><div id="progressFill"></div></div>
   <div id="stage"></div>
@@ -925,6 +981,7 @@
   let crazyGlobalScene = null;
   let lastCrazyBackgroundIndex = -1;
   let crazyMode = false;
+  let crazyDisclaimerCount = 0;
 
   const CRAZY_MODE_STORAGE_KEY = "weekly50-crazy-mode";
 
@@ -1068,6 +1125,9 @@
   const scoreVal = document.getElementById("scoreVal");
   const scoreTotal = document.getElementById("scoreTotal");
   const crazyToggle = document.getElementById("crazyToggle");
+  const crazyDisclaimer = document.getElementById("crazyDisclaimer");
+  const crazyDisclaimerText = document.getElementById("crazyDisclaimerText");
+  const crazyDisclaimerClose = document.getElementById("crazyDisclaimerClose");
 
   function sanitizeFragment(html){
     const doc = new DOMParser().parseFromString("<div>" + html + "</div>", "text/html");
@@ -1532,6 +1592,40 @@
     crazyToggle.setAttribute("aria-pressed", crazyMode ? "true" : "false");
     crazyToggle.setAttribute("aria-label", crazyMode ? "Disable crazy mode" : "Enable crazy mode");
     crazyToggle.title = crazyMode ? "Disable crazy mode" : "Enable crazy mode";
+  }
+
+  function getCrazyDisclaimerMessage(){
+    if (crazyDisclaimerCount === 0) {
+      return "Satirical disclaimer: crazy mode may cause mild distress to lovers of tidy alignment, calm palettes, and respectable restraint. Proceed only if you are prepared for colours to unionise and decorum to leave the building.";
+    }
+    return "Look, I've already warned you — this is still an unhelpfully vibrant decision.";
+  }
+
+  function showCrazyDisclaimer(onClose){
+    crazyDisclaimerText.textContent = getCrazyDisclaimerMessage();
+    crazyDisclaimer.hidden = false;
+    crazyDisclaimerCount += 1;
+
+    const close = () => {
+      crazyDisclaimer.hidden = true;
+      crazyDisclaimerClose.removeEventListener("click", handleClose);
+      crazyDisclaimer.removeEventListener("click", handleBackdrop);
+      document.removeEventListener("keydown", handleKey);
+      if (typeof onClose === "function") onClose();
+    };
+
+    const handleClose = () => close();
+    const handleBackdrop = (event) => {
+      if (event.target === crazyDisclaimer) close();
+    };
+    const handleKey = (event) => {
+      if (event.key === "Escape") close();
+    };
+
+    crazyDisclaimerClose.addEventListener("click", handleClose);
+    crazyDisclaimer.addEventListener("click", handleBackdrop);
+    document.addEventListener("keydown", handleKey);
+    crazyDisclaimerClose.focus();
   }
 
   function randomCrazyFont(){
@@ -2182,7 +2276,11 @@
   window.addEventListener("resize", handleCrazyViewportChange);
 
   crazyToggle.addEventListener("click", () => {
-    setCrazyMode(!crazyMode);
+    if (!crazyMode) {
+      showCrazyDisclaimer(() => setCrazyMode(true));
+      return;
+    }
+    setCrazyMode(false);
   });
 
   try {
