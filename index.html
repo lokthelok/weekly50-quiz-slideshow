@@ -77,9 +77,7 @@
   }
 
   button:focus-visible,
-  a:focus-visible,
-  textarea:focus-visible,
-  input:focus-visible{
+  a:focus-visible{
     outline:3px solid var(--text);
     outline-offset:2px;
   }
@@ -521,11 +519,7 @@
 
   body.crazy-mode #progressTrack,
   body.crazy-mode #scoreboard,
-  body.crazy-mode .panel,
   body.crazy-mode .answerBox,
-  body.crazy-mode textarea,
-  body.crazy-mode .smallInput,
-  body.crazy-mode details,
   body.crazy-mode .bigBtn,
   body.crazy-mode .ghostBtn,
   body.crazy-mode .revealBtn,
@@ -539,11 +533,7 @@
 
   body.crazy-mode #progressTrack,
   body.crazy-mode #scoreboard,
-  body.crazy-mode .panel,
-  body.crazy-mode .answerBox,
-  body.crazy-mode textarea,
-  body.crazy-mode .smallInput,
-  body.crazy-mode details{
+  body.crazy-mode .answerBox{
     background:linear-gradient(135deg, rgba(18,0,33,0.72), rgba(0,98,255,0.28), rgba(255,0,149,0.34));
     backdrop-filter:blur(12px) saturate(1.3);
   }
@@ -1073,92 +1063,12 @@
     color:var(--muted);
   }
 
-  .panel{
-    max-width:700px;
-    margin:0 auto;
-    text-align:left;
-    background:var(--surface);
-    border:1px solid var(--line);
-    border-radius:12px;
-    padding:30px 34px;
-  }
-
-  .panel h2{
-    margin:0 0 10px;
-    font-size:20px;
-    text-transform:uppercase;
-  }
-
-  .panel p,
-  .panel ol{
-    color:var(--muted);
-    font-size:14px;
-    line-height:1.6;
-  }
-
-  .panel ol{padding-left:20px; margin:0 0 18px;}
-
-  .panel code{
-    background:rgba(251,226,223,0.08);
-    padding:2px 6px;
-    border-radius:4px;
-    font-size:12.5px;
-    color:var(--text);
-    word-break:break-all;
-  }
-
-  textarea{
-    width:100%;
-    min-height:120px;
-    resize:vertical;
-    margin-bottom:12px;
-    background:var(--bg);
-    color:var(--text);
-    border:1px solid var(--line);
-    border-radius:8px;
-    padding:12px;
-    font-size:12px;
-    font-family:var(--font-main);
-  }
-
-  .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center;}
-
-  .smallInput{
-    flex:1;
-    min-width:220px;
-    background:var(--bg);
-    color:var(--text);
-    border:1px solid var(--line);
-    border-radius:6px;
-    padding:10px 12px;
-    font-size:12px;
-    font-family:var(--font-main);
-  }
-
   .smallBtn{
     min-height:48px;
     padding:10px 18px;
     border-color:var(--line);
     color:var(--text);
     font-size:12px;
-  }
-
-  .smallBtn.secondary{color:var(--muted);}
-
-  details{margin-top:16px;}
-  summary{
-    cursor:pointer;
-    font-size:12px;
-    letter-spacing:0.04em;
-    text-transform:uppercase;
-    color:var(--muted);
-  }
-
-  .inlineErr{
-    display:none;
-    margin-top:8px;
-    font-size:12px;
-    color:var(--bad);
   }
 
   .spinner{
@@ -1347,13 +1257,10 @@
 (function(){
   "use strict";
 
-  const QUIZ_PAGE_URL = "https://theweeklyfifty.com.au/this-weeks-quiz/";
-  const DIRECT_QUIZ_API_URL = "https://weeklyfifty-7617b.web.app/api/getLatestQuiz";
-  const SAME_ORIGIN_PROXY_API_URL = "/api/getLatestQuiz";
+  const DIRECT_QUIZ_API_URL = "https://us-central1-weeklyfifty-7617b.cloudfunctions.net/getQuizForViewer";
 
   let slides = [];
   let current = 0;
-  let sourceLabel = "";
   let hideLiveScore = false;
   let advanceTimer = null;
   let maxVisitedQuestionIndex = 0;
@@ -1530,44 +1437,6 @@
     return root.innerHTML;
   }
 
-  function parseQuizHTML(html){
-    const doc = new DOMParser().parseFromString(html, "text/html");
-    const titleEl = doc.querySelector(".quizTitle");
-    const title = titleEl ? titleEl.textContent.trim() : "This Week's Fifty";
-
-    const scope = doc.querySelector(".quiz.active") || doc.querySelector(".quizContainer") || doc;
-    const qEls = Array.from(scope.querySelectorAll(".question"));
-
-    const questions = qEls.map((q, i) => {
-      const qTextEl = q.querySelector(".questionText");
-      let number = String(i + 1);
-      let questionHTML = "";
-
-      if (qTextEl) {
-        const clone = qTextEl.cloneNode(true);
-        const bTag = clone.querySelector("b");
-        if (bTag) {
-          const m = bTag.textContent.match(/(\d+)/);
-          if (m) number = m[1];
-          bTag.remove();
-        }
-        questionHTML = sanitizeFragment(clone.innerHTML.trim());
-      }
-
-      const answerEl = q.querySelector(".answerText");
-      const answerHTML = answerEl
-        ? sanitizeFragment(answerEl.innerHTML.trim())
-        : "<em>No answer found in source.</em>";
-
-      return { number, questionHTML, answerHTML };
-    }).filter(q => q.questionHTML);
-
-    const notesEl = doc.querySelector(".quizNotes");
-    const notes = notesEl ? sanitizeFragment(notesEl.innerHTML.trim()) : "";
-
-    return { title, questions, notes };
-  }
-
   function formatDeploymentDate(dateString){
     if (!dateString) return "";
     try {
@@ -1584,7 +1453,7 @@
 
   function parseQuizAPIData(data){
     const quizzes = Array.isArray(data) ? data : [data];
-    const quiz = quizzes[0];
+    const quiz = quizzes[0].quiz;
     if (!quiz || !Array.isArray(quiz.questions) || !quiz.questions.length) {
       throw new Error("Quiz API response did not contain questions.");
     }
@@ -1622,65 +1491,26 @@
     return { title, questions, notes };
   }
 
-  async function fetchText(url){
-    const res = await fetch(url, { cache: "no-store" });
-    if (!res.ok) throw new Error("HTTP " + res.status + " for " + url);
-    return res.text();
-  }
-
   async function fetchJSON(url){
-    const res = await fetch(url, { cache: "no-store" });
+    const res = await fetch(url, {
+      cache: "no-store",
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: '{"data":{"active":true}}'
+    });
     if (!res.ok) throw new Error("HTTP " + res.status + " for " + url);
     return res.json();
   }
 
-  function extractQuizAPIURL(pageHTML){
-    const direct = pageHTML.match(/fetch\(\s*['\"]([^'\"]*\/api\/getLatestQuiz[^'\"]*)['\"]\s*\)/i);
-    if (direct && direct[1]) return direct[1];
-
-    const generic = pageHTML.match(/['\"](https?:\/\/[^'\"]+\/api\/getLatestQuiz[^'\"]*)['\"]/i);
-    if (generic && generic[1]) return generic[1];
-
-    throw new Error("Could not find getLatestQuiz endpoint in page source.");
-  }
-
   async function autoLoad(){
     renderLoading();
-    try {
-      const pageHTML = await fetchText(QUIZ_PAGE_URL);
-      const apiURL = extractQuizAPIURL(pageHTML);
-      const apiData = await fetchJSON(apiURL);
-      const parsed = parseQuizAPIData(apiData);
-      buildSlides(parsed, "Loaded from " + apiURL);
-      renderCurrent();
-      return;
-    } catch (discoverErr) {
-      try {
-        const apiDataDirect = await fetchJSON(DIRECT_QUIZ_API_URL);
-        const parsedDirect = parseQuizAPIData(apiDataDirect);
-        buildSlides(parsedDirect, "Loaded from " + DIRECT_QUIZ_API_URL);
-        renderCurrent();
-        return;
-      } catch (directErr) {
-        try {
-          const apiDataProxy = await fetchJSON(SAME_ORIGIN_PROXY_API_URL);
-          const parsedProxy = parseQuizAPIData(apiDataProxy);
-          buildSlides(parsedProxy, "Loaded from local proxy");
-          renderCurrent();
-          return;
-        } catch (proxyErr) {
-          const details =
-            "discovery: " + (discoverErr && discoverErr.message ? discoverErr.message : String(discoverErr)) +
-            " | direct: " + (directErr && directErr.message ? directErr.message : String(directErr)) +
-            " | proxy: " + (proxyErr && proxyErr.message ? proxyErr.message : String(proxyErr));
-          renderLoadError(new Error(details));
-        }
-      }
-    }
+    const apiData = await fetchJSON(DIRECT_QUIZ_API_URL);
+    const parsed = parseQuizAPIData(apiData.result);
+    buildSlides(parsed);
+    renderCurrent();
   }
 
-  function buildSlides(parsed, label){
-    sourceLabel = label;
+  function buildSlides(parsed){
     slides = [];
     crazyGlobalScene = null;
     lastCrazyBackgroundIndex = -1;
@@ -2040,75 +1870,6 @@
     refreshCrazyPresentation({ rerandomizeFonts: true, rerandomizeMotion: true, fontRoots: [stage, scoreboard, progressTrack, crazyToggle], motionRoots: [stage, scoreboard, progressTrack, crazyToggle] });
   }
 
-  function renderLoadError(err){
-    clearAutoAdvance();
-    scoreboard.style.display = "none";
-
-    stage.innerHTML =
-      '<div class="panel">' +
-        '<h2>Could not auto-load this week\'s quiz</h2>' +
-        '<p>Could not complete page -> endpoint discovery -> API load (<code>' + escapeHTML(err.message || String(err)) + '</code>). This is usually CORS, endpoint changes, or temporary server issues.</p>' +
-        '<p><b>Quick fix: paste the quiz content</b></p>' +
-        '<ol>' +
-          '<li>Open <code>theweeklyfifty.com.au/this-weeks-quiz</code>.</li>' +
-          '<li>Inspect the page and find the <code>quizContainer</code> element.</li>' +
-          '<li>Copy outerHTML and paste it below.</li>' +
-        '</ol>' +
-        '<textarea id="pasteBox" placeholder="Paste quizContainer HTML here..."></textarea>' +
-        '<div class="row">' +
-          '<button class="smallBtn" id="usePasteBtn" type="button">Use Pasted Content</button>' +
-          '<button class="smallBtn secondary" id="retryBtn" type="button">Retry Auto-Load</button>' +
-        '</div>' +
-        '<div class="inlineErr" id="pasteErr"></div>' +
-
-        '<details>' +
-          '<summary>Advanced: custom getLatestQuiz URL</summary>' +
-          '<p style="margin-top:10px;">If you know the latest quiz API endpoint, put it here. It should return a quiz object (or array) with <code>questions</code> that include HTML answers.</p>' +
-          '<p style="margin-top:8px;">For nginx deployments, you can also reverse proxy <code>/api/getLatestQuiz</code> to <code>' + escapeHTML(DIRECT_QUIZ_API_URL) + '</code>. This page will auto-try that path.</p>' +
-          '<div class="row">' +
-            '<input class="smallInput" id="customUrl" type="text" placeholder="https://weeklyfifty-7617b.web.app/api/getLatestQuiz">' +
-            '<button class="smallBtn" id="customFetchBtn" type="button">Fetch</button>' +
-          '</div>' +
-          '<div class="inlineErr" id="customErr"></div>' +
-        '</details>' +
-      '</div>';
-
-    document.getElementById("usePasteBtn").addEventListener("click", () => {
-      const val = document.getElementById("pasteBox").value;
-      const errEl = document.getElementById("pasteErr");
-      try {
-        const parsed = parseQuizHTML(val);
-        if (!parsed.questions.length) throw new Error("No questions found in pasted HTML.");
-        buildSlides(parsed, "Loaded from pasted content");
-        renderCurrent();
-      } catch (e) {
-        errEl.textContent = e.message || String(e);
-        errEl.style.display = "block";
-      }
-    });
-
-    document.getElementById("retryBtn").addEventListener("click", autoLoad);
-
-    document.getElementById("customFetchBtn").addEventListener("click", async () => {
-      const url = document.getElementById("customUrl").value.trim();
-      const errEl = document.getElementById("customErr");
-      errEl.style.display = "none";
-      if (!url) return;
-
-      try {
-        const apiData = await fetchJSON(url);
-        const parsed = parseQuizAPIData(apiData);
-        buildSlides(parsed, "Loaded from custom URL");
-        renderCurrent();
-      } catch (e) {
-        errEl.textContent = e.message || String(e);
-        errEl.style.display = "block";
-      }
-    });
-
-    refreshCrazyPresentation({ rerandomizeFonts: true, rerandomizeMotion: true, fontRoots: [stage, scoreboard, progressTrack, crazyToggle], motionRoots: [stage, scoreboard, progressTrack, crazyToggle] });
-  }
-
   function escapeHTML(str){
     const d = document.createElement("div");
     d.textContent = str;
@@ -2247,9 +2008,9 @@
     const groups = [
       { selector: "body", font: randomCrazyFont() },
       { selector: "#scoreboard, #scoreboard *", font: randomCrazyControlFont() },
-      { selector: "#crazyToggle, button, input, textarea, summary, code", font: randomCrazyControlFont() },
+      { selector: "#crazyToggle, button", font: randomCrazyControlFont() },
       { selector: ".wordmark, .subtitle, .qNumber, .finalScore, .finalVerdict", font: randomCrazyFont() },
-      { selector: ".qText, .qText *, .answerLabel, .answerText, .answerText *, .finalNotes, .statusLine, .panel h2, .panel p, .panel li", font: randomCrazyFont() }
+      { selector: ".qText, .qText *, .answerLabel, .answerText, .answerText *, .finalNotes, .statusLine", font: randomCrazyFont() }
     ];
     const fallbackSelector = "div, span, p, a, li, ul, ol, em, strong, b";
 
@@ -2378,7 +2139,7 @@
       { selector: ".qText, .qText *", role: "question" },
       { selector: ".answerLabel, .answerText, .answerText *", role: "answer" },
       { selector: ".bigBtn, .ghostBtn, .revealBtn, .smallBtn, .markBtn, .miniBtn, #crazyToggle", role: "button" },
-      { selector: "#scoreboard, #progressTrack, #progressFill, .panel, .statusLine", role: "interface" }
+      { selector: "#scoreboard, #progressTrack, #progressFill, .statusLine", role: "interface" }
     ];
 
     roots.forEach(root => {
