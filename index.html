@@ -1253,6 +1253,7 @@
 
 <div id="scoreboard">Score <b id="scoreVal">0</b> / <span id="scoreTotal">0</span></div>
 
+<script src="https://unpkg.com/corsfix"></script>
 <script>
 (function(){
   "use strict";
@@ -1492,7 +1493,7 @@
   }
 
   async function fetchJSON(url){
-    const res = await fetch(url, {
+    const res = await corsfix.fetch(url, {
       cache: "no-store",
       method: "POST",
       headers: { "Content-Type": "application/json" },
