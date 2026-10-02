@@ -72,6 +72,35 @@
     font-size:13px;
   }
 
+  .probeControls{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+
+  .probeControls[hidden],
+  #probeLog[hidden]{display:none;}
+
+  .probeControls button{
+    padding:9px 12px;
+    border:1px solid var(--line);
+    border-radius:6px;
+    background:var(--panel-2);
+    color:var(--text);
+    cursor:pointer;
+  }
+
+  #probeLog{
+    max-height:120px;
+    overflow:auto;
+    margin:0;
+    padding:10px 14px;
+    background:var(--panel);
+    color:var(--muted);
+    font-size:12px;
+    white-space:pre-wrap;
+  }
+
   .frameWrap{
     flex:1;
     min-height:0;
@@ -108,19 +137,111 @@
   <div class="shell">
     <div class="banner">
       <strong>Weekly Fifty test harness</strong>
-      <span>Loads <code>index.html</code> and mocks <code>/api/getLatestQuiz</code> from <code>test-quiz-data.json</code>.</span>
+      <span id="bannerDescription">Loads <code>index.html</code> and mocks <code>/api/getLatestQuiz</code> from <code>test-quiz-data.json</code>.</span>
+      <a href="?iframe-test">Iframe probe</a>
     </div>
     <div id="status">Loading harness...</div>
+    <div id="probeControls" class="probeControls" hidden>
+      <button id="sameOriginProbe" type="button">Same-origin JSON</button>
+      <button id="getProbe" type="button">Cross-origin GET</button>
+      <button id="postProbe" type="button">Cross-origin form POST</button>
+    </div>
+    <pre id="probeLog" role="log" aria-live="polite" hidden></pre>
     <div class="frameWrap">
       <iframe id="preview" title="Weekly Fifty quiz preview"></iframe>
     </div>
-    <div class="hint">If local file fetches are blocked in your browser, serve this folder with a simple static server and reopen <code>test.html</code>.</div>
+    <div id="hint" class="hint">If local file fetches are blocked in your browser, serve this folder with a simple static server and reopen <code>test.html</code>.</div>
   </div>
 
   <script>
+    function setupIframeProbe() {
+      const apiUrl = "https://us-central1-weeklyfifty-7617b.cloudfunctions.net/getQuizForViewer";
+      const status = document.getElementById("status");
+      const log = document.getElementById("probeLog");
+      let frame = document.getElementById("preview");
+      let timer;
+
+      document.getElementById("bannerDescription").textContent = "Iframe access diagnostic";
+      document.getElementById("hint").textContent = "Forms cannot send the JSON Content-Type and body required by this API. Run this test on GitHub Pages; a load event does not mean the parent can read the response.";
+      document.getElementById("probeControls").hidden = false;
+      log.hidden = false;
+      status.textContent = "Choose a probe. Open DevTools Network to inspect request status and frame policies.";
+
+      function report(message) {
+        log.textContent += message + "\n";
+      }
+
+      function runProbe(label, navigate) {
+        clearTimeout(timer);
+        log.textContent = "";
+        status.textContent = label + ": waiting for iframe load...";
+
+        const nextFrame = document.createElement("iframe");
+        nextFrame.id = "preview";
+        nextFrame.name = "quizResponseProbe";
+        nextFrame.title = label + " response";
+        frame.replaceWith(nextFrame);
+        frame = nextFrame;
+
+        frame.addEventListener("load", () => {
+          clearTimeout(timer);
+          report("Iframe load event fired (this does not confirm HTTP success).");
+          try {
+            const text = frame.contentWindow.document.body.textContent;
+            const data = JSON.parse(text);
+            const quiz = Array.isArray(data) ? data[0] : data.result || data;
+            report("Readable JSON; questions: " + (quiz.quiz || quiz).questions.length);
+            status.textContent = label + ": readable JSON.";
+          } catch (error) {
+            report("Parent read/parse failed: " + error.name + ": " + error.message);
+            status.textContent = label + ": no readable quiz JSON.";
+          }
+        }, { once: true });
+
+        timer = setTimeout(() => {
+          report("No iframe load event within 10 seconds; inspect DevTools Network.");
+          status.textContent = label + ": timed out.";
+        }, 10000);
+        navigate(frame);
+      }
+
+      window.addEventListener("message", event => {
+        if (event.source !== frame.contentWindow || event.origin !== new URL(apiUrl).origin) return;
+        report("Received a postMessage from the API origin (contents not displayed).");
+      });
+
+      document.getElementById("sameOriginProbe").addEventListener("click", () => {
+        runProbe("Same-origin JSON", target => { target.src = "./test-quiz-data.json"; });
+      });
+      document.getElementById("getProbe").addEventListener("click", () => {
+        runProbe("Cross-origin GET", target => { target.src = apiUrl; });
+      });
+      document.getElementById("postProbe").addEventListener("click", () => {
+        runProbe("Cross-origin form POST", target => {
+          const form = document.createElement("form");
+          form.method = "POST";
+          form.action = apiUrl;
+          form.target = target.name;
+          form.hidden = true;
+          const field = document.createElement("input");
+          field.name = "data";
+          field.value = JSON.stringify({ active: true });
+          form.appendChild(field);
+          document.body.appendChild(form);
+          form.submit();
+          form.remove();
+        });
+      });
+    }
+
     (async () => {
       const statusEl = document.getElementById("status");
       const preview = document.getElementById("preview");
+
+      if (new URLSearchParams(location.search).has("iframe-test")) {
+        setupIframeProbe();
+        return;
+      }
 
       try {
         statusEl.textContent = "Reading index.html and test-quiz-data.json...";
